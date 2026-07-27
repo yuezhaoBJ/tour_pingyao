@@ -1,0 +1,2948 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="color-scheme" content="dark" />
+  <meta name="theme-color" content="#070d16" />
+  <title>平遥古城 · 时空小特工任务清单</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&family=Noto+Sans+SC:wght@400;500;700;900&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --cyan: #3dd5ff;
+      --cyan-dim: rgba(61, 213, 255, 0.16);
+      --cyan-glow: rgba(61, 213, 255, 0.45);
+      --red: #ef5350;
+      --gold: #f0c14b;
+      --ink: #e8eef5;
+      --text: #e8eef5;
+      --text-muted: rgba(232, 238, 245, 0.68);
+      --panel: rgba(12, 20, 32, 0.82);
+      --panel-solid: #101a28;
+      --card-bg: rgba(18, 28, 42, 0.88);
+      --hud: #070d16;
+      --success: #3dd68c;
+      --border: rgba(61, 213, 255, 0.28);
+      --radius: 14px;
+      --shadow-glow: 0 0 22px var(--cyan-glow);
+      --font-display: "Ma Shan Zheng", "STKaiti", cursive;
+      --font-body: "Noto Sans SC", "PingFang SC", sans-serif;
+      color-scheme: dark;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: var(--font-body);
+      color: var(--text);
+      min-height: 100vh;
+      background:
+        linear-gradient(180deg, rgba(4, 8, 16, 0.78) 0%, rgba(6, 12, 22, 0.88) 50%, rgba(3, 6, 12, 0.94) 100%),
+        url("assets/checklist-hero.png") center top / cover no-repeat fixed;
+      overflow-x: hidden;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 80% 45% at 50% 0%, rgba(61, 213, 255, 0.14), transparent 55%),
+        radial-gradient(ellipse 50% 40% at 10% 90%, rgba(198, 40, 40, 0.12), transparent),
+        radial-gradient(ellipse 50% 40% at 90% 90%, rgba(198, 40, 40, 0.1), transparent);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .scanline {
+      position: fixed;
+      inset: 0;
+      background: repeating-linear-gradient(
+        0deg,
+        transparent,
+        transparent 3px,
+        rgba(0, 0, 0, 0.04) 3px,
+        rgba(0, 0, 0, 0.04) 6px
+      );
+      pointer-events: none;
+      z-index: 999;
+      opacity: 0.5;
+    }
+
+    .app {
+      position: relative;
+      z-index: 1;
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 1.25rem 1rem 3rem;
+    }
+
+    /* —— Header —— */
+    .hud-frame {
+      border: 2px solid rgba(61, 213, 255, 0.45);
+      border-radius: 18px;
+      box-shadow:
+        0 0 30px rgba(61, 213, 255, 0.22),
+        0 16px 48px rgba(0, 0, 0, 0.55),
+        inset 0 0 60px rgba(61, 213, 255, 0.04);
+      background: rgba(8, 14, 24, 0.78);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      overflow: hidden;
+      position: relative;
+      color: var(--text);
+    }
+
+    .hud-frame::before,
+    .hud-frame::after {
+      content: "";
+      position: absolute;
+      width: 56px;
+      height: 56px;
+      border: 2px solid rgba(61, 213, 255, 0.65);
+      pointer-events: none;
+      z-index: 5;
+      box-shadow: 0 0 12px rgba(61, 213, 255, 0.35);
+    }
+    .hud-frame::before { top: 8px; left: 8px; border-right: none; border-bottom: none; }
+    .hud-frame::after { bottom: 8px; right: 8px; border-left: none; border-top: none; }
+
+    .hero {
+      position: relative;
+      padding: 1.5rem 1.25rem 1.25rem;
+      text-align: center;
+      background:
+        linear-gradient(180deg, rgba(6, 12, 22, 0.35), rgba(6, 12, 22, 0.82)),
+        url("assets/tasks/header_center.jpg") center 30% / cover no-repeat;
+      min-height: auto;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-end;
+    }
+
+    .hero-emblem {
+      width: min(160px, 42vw);
+      height: min(160px, 42vw);
+      border-radius: 50%;
+      border: 2px solid rgba(61, 213, 255, 0.55);
+      box-shadow: 0 0 24px rgba(61, 213, 255, 0.35), inset 0 0 20px rgba(61, 213, 255, 0.15);
+      background: url("assets/tasks/header_center.jpg") center / cover no-repeat;
+      margin: 0.35rem auto 0.85rem;
+      position: relative;
+      animation: pulse-glow 3s ease-in-out infinite;
+    }
+
+    .hero-emblem::after {
+      content: "时空特工";
+      position: absolute;
+      left: 50%;
+      bottom: -0.35rem;
+      transform: translateX(-50%);
+      font-size: 0.65rem;
+      letter-spacing: 0.15em;
+      color: var(--cyan);
+      background: rgba(4, 10, 18, 0.85);
+      padding: 0.15rem 0.5rem;
+      border-radius: 999px;
+      border: 1px solid rgba(61, 213, 255, 0.35);
+      white-space: nowrap;
+    }
+
+    @media (min-width: 720px) {
+      .hero {
+        min-height: auto;
+        padding: 1.75rem 1.5rem 1.4rem;
+      }
+      .hero-emblem { width: 180px; height: 180px; }
+    }
+
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-size: 0.75rem;
+      letter-spacing: 0.12em;
+      color: var(--cyan);
+      border: 1px solid rgba(61, 213, 255, 0.4);
+      background: rgba(61, 213, 255, 0.1);
+      padding: 0.25rem 0.75rem;
+      border-radius: 999px;
+      margin-bottom: 0.75rem;
+      animation: pulse-glow 2.4s ease-in-out infinite;
+    }
+
+    @keyframes pulse-glow {
+      0%, 100% { box-shadow: 0 0 6px rgba(61, 213, 255, 0.25); }
+      50% { box-shadow: 0 0 16px rgba(61, 213, 255, 0.45); }
+    }
+
+    .hero h1 {
+      font-family: var(--font-display);
+      font-size: clamp(1.85rem, 5vw, 2.75rem);
+      font-weight: 400;
+      line-height: 1.25;
+      color: #f4f8fc;
+      text-shadow: 0 0 24px rgba(61, 213, 255, 0.35), 0 2px 10px rgba(0, 0, 0, 0.6);
+      margin-bottom: 0.5rem;
+    }
+
+    .hero p {
+      max-width: 36rem;
+      margin: 0 auto;
+      font-size: 0.92rem;
+      color: var(--text-muted);
+      line-height: 1.65;
+    }
+
+    .progress-wrap {
+      margin: 1.25rem auto 0;
+      max-width: 420px;
+      width: 100%;
+    }
+
+    .progress-meta {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.8rem;
+      color: var(--cyan);
+      margin-bottom: 0.4rem;
+    }
+
+    .progress-bar {
+      height: 10px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(61, 213, 255, 0.28);
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, var(--cyan), #7af0ff);
+      box-shadow: 0 0 12px var(--cyan);
+      border-radius: 999px;
+      transition: width 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    /* —— Task grid —— */
+    .section-title {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      margin: 1.5rem 0 0.9rem;
+      padding: 0 0.25rem;
+      font-size: 1rem;
+      color: var(--cyan);
+    }
+
+    .section-title::before,
+    .section-title::after {
+      content: "";
+      flex: 1;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(61, 213, 255, 0.45), transparent);
+      opacity: 0.8;
+    }
+
+    .task-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 0.85rem;
+      padding: 0 0.75rem 1rem;
+    }
+
+    @media (min-width: 720px) {
+      .task-grid { grid-template-columns: repeat(3, 1fr); gap: 1rem; }
+    }
+
+    .task-card {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      border: 1.5px solid rgba(61, 213, 255, 0.55);
+      border-radius: 12px;
+      background: linear-gradient(180deg, rgba(14, 24, 40, 0.95), rgba(8, 14, 24, 0.98));
+      box-shadow: 0 0 16px rgba(61, 213, 255, 0.2), inset 0 0 24px rgba(61, 213, 255, 0.04);
+      cursor: pointer;
+      overflow: hidden;
+      text-align: left;
+      color: var(--text);
+      font: inherit;
+      transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s;
+      animation: card-in 0.55s ease backwards;
+    }
+
+    .task-card::before,
+    .task-card::after {
+      content: "";
+      position: absolute;
+      width: 14px;
+      height: 14px;
+      border: 2px solid rgba(61, 213, 255, 0.8);
+      z-index: 3;
+      pointer-events: none;
+    }
+    .task-card::before { top: 6px; left: 6px; border-right: none; border-bottom: none; }
+    .task-card::after { bottom: 6px; right: 6px; border-left: none; border-top: none; }
+
+    .task-card:nth-child(1) { animation-delay: 0.05s; }
+    .task-card:nth-child(2) { animation-delay: 0.1s; }
+    .task-card:nth-child(3) { animation-delay: 0.15s; }
+    .task-card:nth-child(4) { animation-delay: 0.2s; }
+    .task-card:nth-child(5) { animation-delay: 0.25s; }
+    .task-card:nth-child(6) { animation-delay: 0.3s; }
+    .task-card:nth-child(7) { animation-delay: 0.35s; }
+
+    @keyframes card-in {
+      from { opacity: 0; transform: translateY(16px) scale(0.96); }
+      to { opacity: 1; transform: none; }
+    }
+
+    .task-card:hover,
+    .task-card:focus-visible {
+      transform: translateY(-4px) scale(1.02);
+      box-shadow: 0 0 28px rgba(61, 213, 255, 0.4);
+      border-color: #5ce5ff;
+      outline: none;
+    }
+
+    .task-card.done {
+      border-color: var(--success);
+      box-shadow: 0 0 20px rgba(61, 214, 140, 0.35);
+    }
+
+    .task-card.done .card-check {
+      background: var(--success);
+      border-color: var(--success);
+      color: #052014;
+    }
+
+    .card-top {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.7rem 0.7rem 0.4rem;
+      position: relative;
+      z-index: 1;
+    }
+
+    .card-icon {
+      width: 2.1rem;
+      height: 2.1rem;
+      display: grid;
+      place-items: center;
+      font-size: 1.05rem;
+      border-radius: 50%;
+      background: rgba(0, 20, 40, 0.7);
+      border: 2px solid rgba(61, 213, 255, 0.7);
+      box-shadow: 0 0 10px rgba(61, 213, 255, 0.45);
+      flex-shrink: 0;
+    }
+
+    .card-title {
+      font-size: 0.9rem;
+      font-weight: 700;
+      line-height: 1.3;
+      color: #fff;
+      text-shadow: 0 0 8px rgba(61, 213, 255, 0.35);
+    }
+
+    .card-num {
+      font-size: 0.65rem;
+      color: var(--cyan);
+      font-weight: 600;
+      letter-spacing: 0.08em;
+    }
+
+    .card-art {
+      margin: 0.2rem 0.55rem;
+      height: 112px;
+      border-radius: 8px;
+      display: block;
+      position: relative;
+      overflow: hidden;
+      border: 1px solid rgba(61, 213, 255, 0.35);
+      box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.35);
+      background: #0a121c center / cover no-repeat;
+    }
+
+    .card-art img.art-cover {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .card-art::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(180deg, transparent 45%, rgba(0, 0, 0, 0.35));
+      pointer-events: none;
+    }
+
+    .card-art.has-photo img.art-cover { opacity: 0; }
+
+    .card-desc {
+      padding: 0.5rem 0.7rem 0.75rem;
+      font-size: 0.72rem;
+      line-height: 1.45;
+      color: rgba(230, 240, 250, 0.82);
+      flex: 1;
+    }
+
+    .card-check {
+      position: absolute;
+      right: 0.55rem;
+      bottom: 0.55rem;
+      width: 1.35rem;
+      height: 1.35rem;
+      border: 2px solid rgba(61, 213, 255, 0.65);
+      border-radius: 4px;
+      background: rgba(0, 0, 0, 0.45);
+      display: grid;
+      place-items: center;
+      font-size: 0.85rem;
+      color: transparent;
+      transition: all 0.25s;
+      z-index: 2;
+    }
+
+    .task-card.done .card-check::before { content: "✓"; color: inherit; font-weight: 900; }
+
+    /* —— Footer status —— */
+    .status-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.6rem;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.85rem 1rem 1.1rem;
+      border-top: 1px solid rgba(61, 213, 255, 0.22);
+      background: rgba(0, 0, 0, 0.35);
+    }
+
+    .status-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+      font-size: 0.82rem;
+      color: var(--cyan);
+      padding: 0.4rem 0.75rem;
+      border: 1px solid rgba(61, 213, 255, 0.35);
+      border-radius: 999px;
+      background: rgba(61, 213, 255, 0.08);
+    }
+
+    .status-pill .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--cyan);
+      box-shadow: 0 0 8px var(--cyan);
+      animation: blink 1.4s ease-in-out infinite;
+    }
+
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.35; }
+    }
+
+    .status-pill.all-done .dot {
+      background: var(--success);
+      box-shadow: 0 0 8px var(--success);
+      animation: none;
+    }
+
+    .btn-reset {
+      font: inherit;
+      font-size: 0.75rem;
+      color: rgba(232, 238, 245, 0.45);
+      background: transparent;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 8px;
+      padding: 0.35rem 0.65rem;
+      cursor: pointer;
+    }
+    .btn-reset:hover { color: #fff; border-color: rgba(255, 255, 255, 0.4); }
+
+    .reward-banner {
+      display: none;
+      margin: 1rem 0.75rem 0;
+      padding: 1rem;
+      text-align: center;
+      border: 2px solid rgba(240, 193, 75, 0.55);
+      border-radius: 14px;
+      background: linear-gradient(135deg, rgba(240, 193, 75, 0.18), rgba(198, 40, 40, 0.15));
+      box-shadow: 0 0 24px rgba(240, 193, 75, 0.2);
+      animation: card-in 0.5s ease;
+    }
+
+    .reward-banner.show { display: block; }
+
+    .reward-banner h3 {
+      font-family: var(--font-display);
+      font-size: 1.5rem;
+      color: var(--gold);
+      margin-bottom: 0.35rem;
+    }
+
+    .reward-banner p { font-size: 0.88rem; line-height: 1.55; color: var(--text-muted); }
+
+    /* —— Modal —— */
+    .overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(4, 8, 14, 0.78);
+      backdrop-filter: blur(6px);
+      z-index: 1000;
+      display: grid;
+      place-items: center;
+      padding: 1rem;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.28s, visibility 0.28s;
+    }
+
+    .overlay.open {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .modal {
+      width: min(520px, 100%);
+      max-height: min(90vh, 720px);
+      overflow: auto;
+      border: 2px solid rgba(61, 213, 255, 0.55);
+      border-radius: 16px;
+      background: linear-gradient(165deg, #0e1a28 0%, #121018 100%);
+      box-shadow: 0 0 40px rgba(61, 213, 255, 0.3), 0 20px 50px rgba(0, 0, 0, 0.55);
+      transform: translateY(18px) scale(0.96);
+      transition: transform 0.32s cubic-bezier(0.22, 1, 0.36, 1);
+      color: var(--text);
+    }
+
+    .overlay.open .modal { transform: none; }
+
+    .modal-head {
+      position: sticky;
+      top: 0;
+      z-index: 2;
+      display: flex;
+      align-items: flex-start;
+      gap: 0.75rem;
+      padding: 1rem 1rem 0.85rem;
+      background: linear-gradient(180deg, #152636, rgba(21, 38, 54, 0.95));
+      border-bottom: 1px solid rgba(46, 207, 255, 0.25);
+    }
+
+    .modal-icon {
+      width: 2.75rem;
+      height: 2.75rem;
+      display: grid;
+      place-items: center;
+      font-size: 1.4rem;
+      border-radius: 12px;
+      background: var(--cyan-dim);
+      border: 1px solid var(--cyan);
+      flex-shrink: 0;
+    }
+
+    .modal-head h2 {
+      font-size: 1.15rem;
+      font-weight: 700;
+      line-height: 1.35;
+      color: #f2f6fa;
+    }
+
+    .modal-head .sub {
+      font-size: 0.75rem;
+      color: var(--cyan);
+      margin-top: 0.15rem;
+    }
+
+    .modal-close {
+      margin-left: auto;
+      width: 2rem;
+      height: 2rem;
+      border: 1px solid rgba(46, 207, 255, 0.4);
+      border-radius: 8px;
+      background: transparent;
+      color: var(--cyan);
+      font-size: 1.2rem;
+      cursor: pointer;
+      line-height: 1;
+    }
+    .modal-close:hover { background: var(--cyan-dim); }
+
+    .modal-body { padding: 1rem 1.1rem 1.25rem; }
+
+    .task-hero {
+      display: none;
+      position: relative;
+      width: 100%;
+      height: 160px;
+      overflow: hidden;
+      border-bottom: 1px solid rgba(61, 213, 255, 0.35);
+      background: #0a121c;
+    }
+
+    .task-hero.show { display: block; }
+
+    .task-hero img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .task-hero::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(180deg, transparent 40%, rgba(8, 14, 24, 0.75));
+      pointer-events: none;
+    }
+
+    @media (min-width: 520px) {
+      .task-hero { height: 190px; }
+    }
+
+    .info-block {
+      margin-bottom: 0.9rem;
+      padding: 0.75rem 0.85rem;
+      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(46, 207, 255, 0.15);
+    }
+
+    .info-block h3 {
+      font-size: 0.78rem;
+      color: var(--gold);
+      letter-spacing: 0.06em;
+      margin-bottom: 0.35rem;
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
+    }
+
+    .info-block p {
+      font-size: 0.88rem;
+      line-height: 1.65;
+      color: rgba(242, 246, 250, 0.9);
+    }
+
+    .challenge-box {
+      border-color: rgba(232, 184, 74, 0.45);
+      background: rgba(232, 184, 74, 0.08);
+    }
+
+    .knowledge-box {
+      border-color: rgba(46, 207, 255, 0.35);
+      background: rgba(46, 207, 255, 0.06);
+    }
+
+    .interact-zone {
+      margin-top: 0.35rem;
+      padding: 1rem;
+      border-radius: 14px;
+      border: 1.5px solid rgba(61, 213, 255, 0.4);
+      background: rgba(18, 32, 48, 0.95);
+      box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.04);
+    }
+
+    .interact-zone h3 {
+      font-size: 0.95rem;
+      color: #7ae7ff;
+      margin-bottom: 0.55rem;
+      font-weight: 700;
+      text-shadow: 0 0 10px rgba(61, 213, 255, 0.25);
+    }
+
+    .interact-zone .hint {
+      font-size: 0.84rem;
+      color: rgba(240, 246, 252, 0.88);
+      margin-bottom: 0.75rem;
+      line-height: 1.55;
+    }
+
+    .choice-grid {
+      display: grid;
+      gap: 0.5rem;
+    }
+
+    .choice-btn {
+      font: inherit;
+      text-align: left;
+      padding: 0.75rem 0.9rem;
+      border-radius: 10px;
+      border: 1px solid rgba(61, 213, 255, 0.45);
+      background: rgba(8, 18, 30, 0.95);
+      color: #f5f9fc;
+      cursor: pointer;
+      transition: background 0.2s, border-color 0.2s, transform 0.15s;
+      font-size: 0.9rem;
+      line-height: 1.45;
+      font-weight: 500;
+    }
+
+    .choice-btn:hover { background: rgba(61, 213, 255, 0.18); transform: translateX(3px); border-color: #7ae7ff; }
+    .choice-btn.correct { border-color: var(--success); background: rgba(61, 214, 140, 0.22); color: #d8ffe9; }
+    .choice-btn.wrong { border-color: var(--red); background: rgba(198, 40, 40, 0.22); color: #ffd6d6; opacity: 1; }
+    .choice-btn:disabled { cursor: default; transform: none; }
+
+    .input-row {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+
+    .input-row input,
+    .input-row textarea,
+    .input-row select {
+      flex: 1;
+      min-width: 140px;
+      font: inherit;
+      font-size: 0.92rem;
+      padding: 0.7rem 0.8rem;
+      border-radius: 10px;
+      border: 1px solid rgba(61, 213, 255, 0.45);
+      background: rgba(6, 14, 24, 0.95);
+      color: #f5f9fc;
+      outline: none;
+    }
+
+    .input-row input::placeholder,
+    .input-row textarea::placeholder {
+      color: rgba(200, 220, 235, 0.55);
+    }
+
+    .input-row select option {
+      background: #101a28;
+      color: #f5f9fc;
+    }
+
+    .input-row textarea { min-height: 72px; resize: vertical; width: 100%; }
+
+    .btn-primary {
+      font: inherit;
+      font-weight: 700;
+      font-size: 0.9rem;
+      padding: 0.7rem 1.1rem;
+      border: none;
+      border-radius: 10px;
+      background: linear-gradient(135deg, var(--cyan), #5adfff);
+      color: #041018;
+      cursor: pointer;
+      box-shadow: 0 0 16px rgba(46, 207, 255, 0.4);
+      transition: transform 0.15s, filter 0.15s;
+      white-space: nowrap;
+    }
+    .btn-primary:hover { transform: scale(1.03); filter: brightness(1.08); }
+    .btn-primary:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+      transform: none;
+      filter: none;
+      box-shadow: none;
+    }
+
+    .btn-ghost {
+      font: inherit;
+      font-size: 0.85rem;
+      padding: 0.65rem 1rem;
+      border-radius: 10px;
+      border: 1px solid rgba(46, 207, 255, 0.4);
+      background: transparent;
+      color: var(--cyan);
+      cursor: pointer;
+    }
+
+    .feedback {
+      margin-top: 0.75rem;
+      padding: 0.65rem 0.75rem;
+      border-radius: 10px;
+      font-size: 0.85rem;
+      line-height: 1.5;
+      display: none;
+    }
+    .feedback.show { display: block; }
+    .feedback.ok { background: rgba(61, 214, 140, 0.15); border: 1px solid var(--success); color: #b8f5d4; }
+    .feedback.bad { background: rgba(198, 40, 40, 0.15); border: 1px solid var(--red); color: #ffc9c9; }
+
+    .modal-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.55rem;
+      margin-top: 1rem;
+      padding-top: 0.85rem;
+      border-top: 1px solid rgba(46, 207, 255, 0.2);
+    }
+
+    .abacus {
+      display: flex;
+      gap: 0.35rem;
+      justify-content: center;
+      margin-bottom: 0.75rem;
+      flex-wrap: wrap;
+    }
+
+    .bead-col {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.25rem;
+    }
+
+    .bead {
+      width: 28px;
+      height: 18px;
+      border-radius: 999px;
+      background: linear-gradient(180deg, #f0c14b, #b8860b);
+      border: 1px solid #8b6914;
+      cursor: pointer;
+      transition: transform 0.2s, filter 0.2s;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    }
+    .bead:hover { filter: brightness(1.15); }
+    .bead.active { transform: translateY(-10px); background: linear-gradient(180deg, #ffe082, #e8b84a); }
+
+    .pose-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0.45rem;
+      margin-bottom: 0.65rem;
+    }
+
+    .pose-btn {
+      aspect-ratio: 1;
+      font-size: 1.8rem;
+      border-radius: 12px;
+      border: 1.5px solid rgba(46, 207, 255, 0.35);
+      background: rgba(46, 207, 255, 0.08);
+      cursor: pointer;
+      transition: transform 0.15s, border-color 0.15s, background 0.15s;
+    }
+    .pose-btn:hover { transform: scale(1.06); }
+    .pose-btn.selected {
+      border-color: var(--gold);
+      background: rgba(232, 184, 74, 0.2);
+      box-shadow: 0 0 12px rgba(232, 184, 74, 0.4);
+    }
+
+    .star-rate {
+      display: flex;
+      gap: 0.35rem;
+      margin: 0.5rem 0 0.75rem;
+      font-size: 1.6rem;
+    }
+    .star-rate button {
+      background: none;
+      border: none;
+      cursor: pointer;
+      filter: grayscale(1) opacity(0.45);
+      transition: filter 0.15s, transform 0.15s;
+      font-size: inherit;
+      padding: 0;
+    }
+    .star-rate button.on { filter: none; transform: scale(1.1); }
+
+    /* Welcome / reward */
+    .welcome-art {
+      font-size: 3rem;
+      text-align: center;
+      margin: 0.5rem 0 0.75rem;
+      animation: float 3s ease-in-out infinite;
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-8px); }
+    }
+
+    .confetti {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 2000;
+      overflow: hidden;
+    }
+
+    .confetti i {
+      position: absolute;
+      top: -12px;
+      width: 8px;
+      height: 14px;
+      border-radius: 2px;
+      animation: fall linear forwards;
+    }
+
+    @keyframes fall {
+      to { transform: translateY(105vh) rotate(720deg); opacity: 0.2; }
+    }
+
+    .quiz-progress {
+      display: flex;
+      gap: 0.35rem;
+      margin-bottom: 0.75rem;
+      justify-content: center;
+    }
+
+    .quiz-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: rgba(46, 207, 255, 0.25);
+      border: 1px solid rgba(46, 207, 255, 0.45);
+    }
+
+    .quiz-dot.on { background: var(--cyan); box-shadow: 0 0 8px var(--cyan-glow); }
+    .quiz-dot.done { background: var(--success); border-color: var(--success); }
+
+    .quiz-q {
+      font-size: 1rem;
+      font-weight: 700;
+      color: #ffffff;
+      line-height: 1.5;
+      margin-bottom: 0.7rem;
+      text-shadow: 0 1px 2px rgba(0, 0, 0, 0.45);
+    }
+
+    .quiz-tip {
+      margin-top: 0.55rem;
+      font-size: 0.84rem;
+      color: #9becff;
+      line-height: 1.5;
+      display: none;
+      background: rgba(61, 213, 255, 0.12);
+      border: 1px solid rgba(61, 213, 255, 0.3);
+      border-radius: 8px;
+      padding: 0.5rem 0.65rem;
+    }
+
+    .quiz-tip.show { display: block; }
+
+    .step-label {
+      display: inline-block;
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      color: #041018;
+      background: linear-gradient(135deg, #7ae7ff, #3dd5ff);
+      border: none;
+      border-radius: 999px;
+      padding: 0.2rem 0.65rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .warmup-done-tag {
+      font-size: 0.86rem;
+      color: #9dffc4;
+      font-weight: 600;
+      margin: 0.35rem 0 0.75rem;
+      display: none;
+    }
+
+    .warmup-done-tag.show { display: block; }
+
+    .interact-zone .choice-btn {
+      color: #f5f9fc;
+      background: rgba(6, 16, 28, 0.98);
+      border-color: rgba(61, 213, 255, 0.5);
+    }
+
+    .interact-zone .choice-btn:hover {
+      background: rgba(61, 213, 255, 0.2);
+      color: #ffffff;
+    }
+
+    .interact-zone h3 { color: #7ae7ff; }
+
+    .interact-zone .hint { color: rgba(240, 246, 252, 0.9); }
+
+    #quizLocked {
+      opacity: 0.72;
+      pointer-events: none;
+      filter: none;
+    }
+
+    #quizLocked.unlocked {
+      opacity: 1;
+      pointer-events: auto;
+      filter: none;
+    }
+
+    #quizLocked:not(.unlocked) .hint,
+    #quizLocked:not(.unlocked) .quiz-q,
+    #quizLocked:not(.unlocked) .choice-btn {
+      color: rgba(230, 240, 250, 0.75);
+    }
+
+    #beadCount {
+      color: rgba(240, 246, 252, 0.9) !important;
+      font-weight: 600;
+    }
+
+    .photo-box {
+      margin-top: 0.85rem;
+      padding: 0.9rem;
+      border-radius: 14px;
+      border: 1.5px dashed rgba(240, 193, 75, 0.45);
+      background: rgba(240, 193, 75, 0.1);
+    }
+
+    .photo-box h3 { color: var(--gold) !important; margin-bottom: 0.35rem; }
+
+    .photo-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin-top: 0.65rem;
+    }
+
+    .photo-actions label.btn-photo,
+    .photo-actions button {
+      font: inherit;
+      font-size: 0.85rem;
+      font-weight: 700;
+      padding: 0.65rem 0.9rem;
+      border-radius: 10px;
+      cursor: pointer;
+      border: 1px solid rgba(240, 193, 75, 0.4);
+      background: rgba(0, 0, 0, 0.35);
+      color: var(--gold);
+    }
+
+    .photo-actions label.btn-photo.primary,
+    .photo-actions button.primary {
+      background: linear-gradient(135deg, #f0a04a, #e87830);
+      color: #fff;
+      border-color: transparent;
+      box-shadow: 0 4px 12px rgba(232, 120, 48, 0.35);
+    }
+
+    .photo-actions input[type="file"] { display: none; }
+
+    .photo-preview-wrap {
+      margin-top: 0.75rem;
+      display: none;
+      position: relative;
+    }
+
+    .photo-preview-wrap.show { display: block; }
+
+    .photo-preview-wrap img {
+      width: 100%;
+      max-height: 220px;
+      object-fit: cover;
+      border-radius: 12px;
+      border: 2px solid rgba(240, 193, 75, 0.35);
+      display: block;
+    }
+
+    .photo-stamp {
+      position: absolute;
+      right: 10px;
+      bottom: 10px;
+      background: rgba(8, 28, 42, 0.88);
+      color: var(--cyan);
+      font-size: 0.72rem;
+      font-weight: 700;
+      padding: 0.3rem 0.55rem;
+      border-radius: 8px;
+      letter-spacing: 0.04em;
+      border: 1px solid rgba(61, 213, 255, 0.35);
+    }
+
+    .card-art.has-photo {
+      background-size: cover !important;
+      background-position: center !important;
+    }
+
+    .card-art.has-photo .art-cover { opacity: 0; }
+    .card-art.has-photo .art-emoji { display: none; }
+
+    .card-photo-badge {
+      position: absolute;
+      left: 0.55rem;
+      bottom: 0.55rem;
+      font-size: 0.65rem;
+      font-weight: 700;
+      color: #fff;
+      background: rgba(232, 120, 48, 0.92);
+      padding: 0.15rem 0.4rem;
+      border-radius: 6px;
+      z-index: 2;
+    }
+
+    .album-strip {
+      display: none;
+      gap: 0.5rem;
+      overflow-x: auto;
+      padding: 0.75rem 0.75rem 0;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .album-strip.show { display: flex; }
+
+    .album-item {
+      flex: 0 0 auto;
+      width: 88px;
+      text-align: center;
+    }
+
+    .album-item img {
+      width: 88px;
+      height: 66px;
+      object-fit: cover;
+      border-radius: 10px;
+      border: 2px solid rgba(61, 213, 255, 0.3);
+      display: block;
+    }
+
+    .album-item span {
+      display: block;
+      font-size: 0.65rem;
+      color: var(--cyan);
+      margin-top: 0.25rem;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .album-title {
+      display: none;
+      padding: 0.85rem 0.75rem 0;
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: var(--cyan);
+    }
+
+    .album-title.show { display: block; }
+
+    /* Agent profile */
+    .agent-bar {
+      display: none;
+      align-items: center;
+      gap: 0.75rem;
+      margin: 1rem auto 0;
+      padding: 0.55rem 0.85rem;
+      max-width: 420px;
+      width: 100%;
+      background: rgba(0, 0, 0, 0.35);
+      border: 1px solid rgba(61, 213, 255, 0.3);
+      border-radius: 999px;
+      box-sizing: border-box;
+    }
+
+    .agent-bar.show { display: flex; }
+
+    .agent-bar img {
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 2px solid var(--cyan);
+      flex-shrink: 0;
+    }
+
+    .agent-bar .agent-meta { text-align: left; min-width: 0; }
+    .agent-bar .agent-name {
+      font-weight: 700;
+      color: #f2f6fa;
+      font-size: 0.95rem;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .agent-bar .agent-role {
+      font-size: 0.72rem;
+      color: var(--cyan);
+    }
+
+    .profile-setup {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.75rem;
+      margin-bottom: 1rem;
+      padding: 1rem;
+      border-radius: 14px;
+      background: rgba(61, 213, 255, 0.08);
+      border: 1px solid rgba(61, 213, 255, 0.25);
+    }
+
+    .avatar-pick {
+      position: relative;
+      width: 96px;
+      height: 96px;
+      border-radius: 50%;
+      border: 2px dashed rgba(61, 213, 255, 0.45);
+      background: rgba(0, 0, 0, 0.35);
+      display: grid;
+      place-items: center;
+      overflow: hidden;
+      flex-shrink: 0;
+    }
+
+    .avatar-pick img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: none;
+    }
+
+    .avatar-pick.has-img img { display: block; }
+    .avatar-pick.has-img .avatar-placeholder { display: none; }
+
+    .avatar-placeholder {
+      text-align: center;
+      font-size: 0.72rem;
+      color: var(--cyan);
+      line-height: 1.35;
+      padding: 0.4rem;
+    }
+
+    .avatar-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      justify-content: center;
+      width: 100%;
+    }
+
+    .avatar-actions label.btn-photo {
+      font: inherit;
+      font-size: 0.82rem;
+      font-weight: 700;
+      padding: 0.55rem 0.85rem;
+      border-radius: 10px;
+      cursor: pointer;
+      border: 1px solid rgba(61, 213, 255, 0.4);
+      background: rgba(0, 0, 0, 0.35);
+      color: #7ae7ff;
+    }
+
+    .avatar-actions label.btn-photo.primary {
+      background: linear-gradient(135deg, #3dd5ff, #1a9bb8);
+      color: #041018;
+      border-color: transparent;
+      box-shadow: 0 4px 12px rgba(61, 213, 255, 0.3);
+    }
+
+    .avatar-actions input[type="file"] { display: none; }
+
+    .nick-row {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 0.35rem;
+    }
+
+    .nick-row label {
+      font-size: 0.8rem;
+      color: var(--cyan);
+      font-weight: 700;
+    }
+
+    .nick-row input {
+      font: inherit;
+      font-size: 1rem;
+      padding: 0.7rem 0.85rem;
+      border-radius: 10px;
+      border: 1px solid rgba(61, 213, 255, 0.35);
+      background: rgba(0, 0, 0, 0.4);
+      color: #f2f6fa;
+      outline: none;
+    }
+
+    .nick-row input:focus {
+      border-color: var(--cyan);
+      box-shadow: 0 0 0 3px rgba(61, 213, 255, 0.15);
+    }
+
+    .profile-error {
+      font-size: 0.8rem;
+      color: #ff8a80;
+      display: none;
+    }
+
+    .profile-error.show { display: block; }
+
+    .btn-report {
+      display: none;
+      width: calc(100% - 1.5rem);
+      margin: 0.85rem 0.75rem 0;
+      font: inherit;
+      font-weight: 700;
+      font-size: 0.95rem;
+      padding: 0.85rem 1rem;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      color: #fff;
+      background: linear-gradient(135deg, #e8a030, #c45c1a);
+      box-shadow: 0 6px 18px rgba(196, 92, 26, 0.35);
+    }
+
+    .btn-report.show { display: block; }
+    .btn-report:hover { filter: brightness(1.05); }
+
+    /* Report */
+    #reportOverlay .modal {
+      width: min(640px, 100%);
+      max-height: min(92vh, 900px);
+    }
+
+    .report {
+      color: var(--text);
+    }
+
+    .report-hero {
+      display: flex;
+      align-items: center;
+      gap: 0.85rem;
+      padding: 0.5rem 0 1rem;
+      border-bottom: 1px solid rgba(61, 213, 255, 0.2);
+      margin-bottom: 1rem;
+    }
+
+    .report-hero img {
+      width: 72px;
+      height: 72px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 3px solid var(--gold);
+      flex-shrink: 0;
+    }
+
+    .report-hero h3 {
+      font-family: var(--font-display);
+      font-size: 1.45rem;
+      color: #f4f8fc;
+      font-weight: 400;
+      line-height: 1.3;
+    }
+
+    .report-hero .sub {
+      font-size: 0.8rem;
+      color: var(--cyan);
+      margin-top: 0.25rem;
+    }
+
+    .report-summary {
+      font-size: 0.9rem;
+      line-height: 1.7;
+      color: var(--text-muted);
+      margin-bottom: 1rem;
+      padding: 0.85rem;
+      background: rgba(61, 213, 255, 0.08);
+      border-radius: 12px;
+      border: 1px solid rgba(61, 213, 255, 0.18);
+    }
+
+    .report-entry {
+      margin-bottom: 1.1rem;
+      padding-bottom: 1rem;
+      border-bottom: 1px dashed rgba(61, 213, 255, 0.22);
+    }
+
+    .report-entry:last-of-type { border-bottom: none; }
+
+    .report-entry h4 {
+      font-size: 0.95rem;
+      color: #f2f6fa;
+      margin-bottom: 0.35rem;
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
+    }
+
+    .report-entry .place {
+      font-size: 0.75rem;
+      color: var(--cyan);
+      margin-bottom: 0.5rem;
+    }
+
+    .report-entry img {
+      width: 100%;
+      max-height: 200px;
+      object-fit: cover;
+      border-radius: 12px;
+      margin-bottom: 0.55rem;
+      border: 1px solid rgba(61, 213, 255, 0.2);
+    }
+
+    .report-entry .caption {
+      font-size: 0.86rem;
+      line-height: 1.65;
+      color: var(--text-muted);
+    }
+
+    .report-entry .note {
+      margin-top: 0.4rem;
+      font-size: 0.8rem;
+      color: var(--gold);
+      font-style: italic;
+    }
+
+    .report-footer {
+      text-align: center;
+      margin-top: 0.5rem;
+      padding: 0.85rem;
+      border-radius: 12px;
+      background: linear-gradient(135deg, rgba(240, 193, 75, 0.18), rgba(198, 40, 40, 0.12));
+      border: 1px solid rgba(240, 193, 75, 0.35);
+      font-size: 0.88rem;
+      line-height: 1.6;
+      color: var(--text-muted);
+    }
+
+    .report-footer strong {
+      display: block;
+      font-family: var(--font-display);
+      font-size: 1.25rem;
+      color: var(--gold);
+      margin-bottom: 0.25rem;
+      font-weight: 400;
+    }
+
+    #reportCapture {
+      background: #101a28;
+      color: #e8eef5;
+      padding: 0.25rem 0.15rem 0.5rem;
+      border-radius: 8px;
+    }
+
+    .save-img-status {
+      font-size: 0.8rem;
+      color: var(--cyan);
+      text-align: center;
+      margin-top: 0.5rem;
+      display: none;
+    }
+
+    .save-img-status.show { display: block; }
+  </style>
+</head>
+<body>
+  <div class="scanline" aria-hidden="true"></div>
+  <div class="confetti" id="confetti" aria-hidden="true"></div>
+
+  <div class="app">
+    <div class="hud-frame">
+      <header class="hero">
+        <div class="hero-badge">⏱ 时空特工系统 · ONLINE</div>
+        <div class="hero-emblem" aria-hidden="true"></div>
+        <h1>平遥古城：时空小特工任务清单</h1>
+        <p>穿越 2800 年历史，化身古城守护者！点开任务卡了解详情，完成小挑战后打勾，探索晋商故里的秘密。</p>
+        <div class="progress-wrap">
+          <div class="progress-meta">
+            <span>任务进度</span>
+            <span id="progressText">0 / 7</span>
+          </div>
+          <div class="progress-bar" role="progressbar" aria-valuemin="0" aria-valuemax="7" aria-valuenow="0">
+            <div class="progress-fill" id="progressFill"></div>
+          </div>
+        </div>
+        <div class="agent-bar" id="agentBar">
+          <img id="agentAvatarImg" alt="特工头像" />
+          <div class="agent-meta">
+            <div class="agent-name" id="agentNameText">时空小特工</div>
+            <div class="agent-role">古城时空小特工 · 任务进行中</div>
+          </div>
+        </div>
+      </header>
+
+      <div class="reward-banner" id="rewardBanner">
+        <h3>🏅 古城时空小特工</h3>
+        <p>全部任务完成！你已解锁荣誉称号，可以生成专属任务报告啦！</p>
+      </div>
+      <button type="button" class="btn-report" id="reportBtn">📄 生成我的任务报告</button>
+
+      <div class="album-title" id="albumTitle">📷 特工打卡相册</div>
+      <div class="album-strip" id="albumStrip"></div>
+
+      <div class="section-title">任务清单</div>
+
+      <div class="task-grid" id="taskGrid"></div>
+
+      <footer class="status-bar">
+        <div class="status-pill" id="statusPill">
+          <span class="dot" aria-hidden="true"></span>
+          <span id="statusText">特工状态：任务进行中</span>
+        </div>
+        <div class="status-pill" id="readyPill">准备好接受任务了吗？</div>
+        <button type="button" class="btn-reset" id="resetBtn">重置进度</button>
+      </footer>
+    </div>
+  </div>
+
+  <!-- Welcome -->
+  <div class="overlay open" id="welcomeOverlay" role="dialog" aria-modal="true" aria-labelledby="welcomeTitle">
+    <div class="modal">
+      <div class="modal-head">
+        <div class="modal-icon">🕵️</div>
+        <div>
+          <h2 id="welcomeTitle">欢迎，时空小特工！</h2>
+          <div class="sub">先登记特工身份</div>
+        </div>
+      </div>
+      <div class="modal-body">
+        <div class="profile-setup">
+          <div class="avatar-pick" id="avatarPick">
+            <span class="avatar-placeholder">🕵️<br />特工头像</span>
+            <img id="welcomeAvatarPreview" alt="头像预览" />
+          </div>
+          <div class="avatar-actions">
+            <label class="btn-photo primary">
+              📸 拍照
+              <input type="file" id="welcomeAvatarCamera" accept="image/*" capture="user" />
+            </label>
+            <label class="btn-photo">
+              🖼️ 选择文件
+              <input type="file" id="welcomeAvatarAlbum" accept="image/*" />
+            </label>
+          </div>
+          <div class="nick-row">
+            <label for="nickInput">特工昵称</label>
+            <input type="text" id="nickInput" maxlength="12" placeholder="例如：小遥、勇士豆豆" autocomplete="nickname" />
+          </div>
+          <p class="profile-error" id="profileError">请上传头像并填写昵称后再出发～</p>
+        </div>
+        <div class="info-block">
+          <h3>📜 任务背景</h3>
+          <p>小特工，欢迎来到拥有 2800 多年历史的平遥古城！完成挑战、拍照打卡、探索晋商故里——全部通关后可生成专属任务报告！</p>
+        </div>
+        <div class="info-block knowledge-box">
+          <h3>🎮 怎么玩</h3>
+          <p>1. 拍照或选择文件设置头像，并输入昵称<br />2. 热身闯关 + 知识问答 + 拍照打卡<br />3. 全部完成后生成图文任务报告</p>
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="btn-primary" id="startBtn" style="flex:1">接受任务，出发！</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Task detail -->
+  <div class="overlay" id="taskOverlay" role="dialog" aria-modal="true" aria-labelledby="taskTitle">
+    <div class="modal">
+      <div class="modal-head">
+        <div class="modal-icon" id="taskIcon">🏯</div>
+        <div>
+          <h2 id="taskTitle">任务</h2>
+          <div class="sub" id="taskPlace">目标地点</div>
+        </div>
+        <button type="button" class="modal-close" data-close="taskOverlay" aria-label="关闭">×</button>
+      </div>
+      <div class="task-hero" id="taskHero" aria-hidden="true">
+        <img id="taskHeroImg" alt="" />
+      </div>
+      <div class="modal-body" id="taskBody"></div>
+    </div>
+  </div>
+
+  <!-- Report -->
+  <div class="overlay" id="reportOverlay" role="dialog" aria-modal="true" aria-labelledby="reportTitle">
+    <div class="modal">
+      <div class="modal-head">
+        <div class="modal-icon">📄</div>
+        <div>
+          <h2 id="reportTitle">时空特工任务报告</h2>
+          <div class="sub">图文打卡成果</div>
+        </div>
+        <button type="button" class="modal-close" data-close="reportOverlay" aria-label="关闭">×</button>
+      </div>
+      <div class="modal-body report" id="reportBody"></div>
+    </div>
+  </div>
+
+  <script>
+    const STORAGE_KEY = "pingyao-agent-progress-v4";
+    let pendingAvatar = "";
+
+    const REPORT_COPY = {
+      1: "登上平遥古城墙，感受明代城防气势。特工在敌楼与垛口之间巡逻，留下城墙打卡照，守护龟城平安。",
+      2: "走进票号，触摸晋商「汇通天下」的智慧。算盘声声，汇票传信，特工记录下古代金融的秘密。",
+      3: "化身小镖师，了解武装押运的传奇。仗剑护镖的姿态定格成照，一路平安的誓言响彻关山。",
+      4: "走进县衙大堂，看见「明镜高悬」。特工明白：公正清明，才是断案与做人的明镜。",
+      5: "寻访推光漆器与剪纸等非遗宝藏。匠心手作被镜头珍藏，文化之美在特工心里生了根。",
+      6: "舌尖上的平遥：牛肉、碗托、栲栳栳……美食打卡不仅是味道，更是风土人情的一课。",
+      7: "夜色中的古城与《又见平遥》光影，让特工穿越百年。华灯与故事，照亮晋商信义之路。",
+    };
+
+    const TASKS = [
+      {
+        id: 1,
+        icon: "🏯",
+        title: "任务一：城墙巡逻",
+        short: "登上城墙，巡逻守卫，发现异常，保护古城安全！",
+        place: "平遥古城墙",
+        content: "登上雄伟的古城墙，沿着城墙走一段路，感受古城的气势。寻找城墙上的「敌楼」和「角楼」，数一数你看到了多少个？想象一下古代士兵是如何在这里巡逻和防御的。",
+        challenge: "找到城墙上刻有「平遥」字样的砖块，并拍下照片打卡。",
+        knowledge: "平遥古城墙是中国保存最完整的明代城墙之一。墙上约有 72 座敌楼、3000 多个垛口，据说象征孔子七十二贤人和三千弟子；城门布局像乌龟，因此又叫「龟城」。",
+        interact: "wall",
+        cover: "assets/tasks/task1.jpg",
+        photo: { title: "城墙打卡照", hint: "拍一张城墙 / 敌楼 /「平遥」砖的照片吧！" },
+        quizzes: [
+          { q: "平遥城墙上大约有多少座敌楼？", options: ["12 座", "72 座", "300 座"], a: 1, tip: "传说对应孔子的「七十二贤人」。" },
+          { q: "城墙上约 3000 个垛口，据说象征什么？", options: ["三千士兵", "孔子的三千弟子", "三千块城砖"], a: 1, tip: "军事建筑里藏着儒家文化哦。" },
+          { q: "平遥古城因为形状像什么，又被称为「龟城」？", options: ["凤凰", "龙", "乌龟"], a: 2, tip: "六座城门像龟的头尾和四足。" },
+        ],
+      },
+      {
+        id: 2,
+        icon: "🧮",
+        title: "任务二：票号探秘",
+        short: "走进票号，破解密码，了解古代金融，找到隐藏线索！",
+        place: "日升昌票号 或 协同庆票号",
+        content: "走进中国第一家票号——日升昌，或者参观拥有「地下金库」的协同庆票号。了解古代的「银行」是如何运作的，晋商是如何通过「汇通天下」来管理财富的。在协同庆，尝试寻找通往地下金库的入口，感受金库的神秘与厚重。",
+        challenge: "在票号内找到算盘，拨几下，并拍一张算盘或票号内景打卡照。",
+        knowledge: "票号是清代山西商人创立的金融机构，是现代银行的雏形。日升昌用纸质汇票代替长途运银，口号「汇通天下」；汇票还有汉字密押、水印等防伪妙招。",
+        interact: "abacus",
+        cover: "assets/tasks/task2.jpg",
+        photo: { title: "票号打卡照", hint: "拍算盘、柜台，或「汇通天下」匾额都可以！" },
+        quizzes: [
+          { q: "日升昌票号最像今天的什么机构？", options: ["菜市场", "银行", "学校"], a: 1, tip: "它可以存银、汇银，是金融鼻祖。" },
+          { q: "「汇通天下」最接近哪一种意思？", options: ["钱可以汇到很远的地方", "天下人都要来平遥吃饭", "城墙通向四面八方"], a: 0, tip: "一张汇票，银两就能在各地流通。" },
+          { q: "古人出门为什么更喜欢用汇票，而不是背很多银子？", options: ["汇票更漂亮", "更安全、更方便", "银子太沉抬不动而已，没有别的原因"], a: 1, tip: "少运现银，也少了被劫的风险。" },
+        ],
+      },
+      {
+        id: 3,
+        icon: "⚔️",
+        title: "任务三：镖局闯关",
+        short: "护送镖车，击败劫镖贼，完成挑战，守护一路平安！",
+        place: "中国镖局博物馆 或 华北第一镖局",
+        content: "参观镖局，了解古代镖师的职责和生活。看看镖师们使用的兵器和工具，想象他们是如何「走镖」护送贵重物品的。如果条件允许，可以参与一些模拟「运镖」的小游戏或体验活动。",
+        challenge: "模仿镖师的经典姿势，拍一张帅气的护镖打卡照。",
+        knowledge: "镖局像古代的「武装物流公司」，专门护送银两和贵重货物。票号汇票普及后，长途运现银变少，镖局生意也渐渐受到影响。",
+        interact: "escort",
+        cover: "assets/tasks/task3.jpg",
+        photo: { title: "镖师打卡照", hint: "摆个仗剑姿势，或和兵器、镖车合影！" },
+        quizzes: [
+          { q: "镖局的工作，最像今天的哪一种？", options: ["武装押运 / 安保物流", "开饭店", "教书法"], a: 0, tip: "又运货，又保护安全。" },
+          { q: "镖师走镖时，最常护送的是什么？", options: ["玩具和糖", "银两和贵重货物", "只护送信件"], a: 1, tip: "晋商生意大，路上需要保镖。" },
+          { q: "票号用汇票之后，为什么镖局会受影响？", options: ["大家不喜欢镖师了", "少运现银，押运需求变少", "城墙太高过不去"], a: 1, tip: "金融方式一变，运输方式也会变。" },
+        ],
+      },
+      {
+        id: 4,
+        icon: "⚖️",
+        title: "任务四：县衙断案",
+        short: "化身小捕快，搜集证据，公正断案，伸张正义！",
+        place: "平遥县衙",
+        content: "走进平遥县衙，了解古代县太爷是如何审理案件、管理百姓的。参观大堂、二堂、监狱等区域，感受古代衙门的庄严。如果能赶上「升堂表演」，更可以亲身体验古代审案的场景。",
+        challenge: "找到「明镜高悬」牌匾，拍一张大堂或匾额打卡照。",
+        knowledge: "平遥县衙是全国现存规模最大的古代县级衙署之一。大堂是审案办公的核心，「明镜高悬」提醒官吏断案要公正清明。",
+        interact: "yamen",
+        cover: "assets/tasks/task4.jpg",
+        photo: { title: "县衙打卡照", hint: "拍「明镜高悬」、大堂公案，或升堂场景！" },
+        quizzes: [
+          { q: "「明镜高悬」最接近哪一种意思？", options: ["镜子挂很高，用来照头发", "断案要像明镜一样公正清明", "衙门里禁止使用镜子"], a: 1, tip: "明镜 = 清楚、公正。" },
+          { q: "县衙大堂主要用来做什么？", options: ["开演唱会", "审理案件、办理公务", "卖平遥牛肉"], a: 1, tip: "大堂是县太爷办公审案的地方。" },
+          { q: "平遥县衙在全国古衙中有什么特别之处？", options: ["它是现存规模最大的县级衙署之一", "它是中国唯一的皇宫", "它没有大堂"], a: 0, tip: "有人称之为「古衙之最」。" },
+        ],
+      },
+      {
+        id: 5,
+        icon: "🎁",
+        title: "任务五：非遗寻宝",
+        short: "寻找非遗宝藏，体验传统技艺，解开谜题，传承文化之美！",
+        place: "古城内非遗体验店（推光漆器、剪纸等）",
+        content: "在古城中寻找平遥的非物质文化遗产，例如精美的推光漆器、栩栩如生的剪纸艺术。了解这些传统手工艺品的制作过程，感受匠人的智慧和耐心。如果时间允许，可以尝试亲手制作一件小小的非遗作品。",
+        challenge: "挑选一件最喜欢的非遗作品，拍一张特写打卡照，并说说吸引你的地方。",
+        knowledge: "平遥推光漆器是中国四大名漆器之一，要用手掌反复推光，直到漆面像镜子一样亮；剪纸则以精巧构思展现民间艺术魅力。",
+        interact: "heritage",
+        cover: "assets/tasks/task5.jpg",
+        photo: { title: "非遗打卡照", hint: "拍推光漆器、剪纸，或你亲手做的小作品！" },
+        quizzes: [
+          { q: "推光漆器为什么叫「推光」？", options: ["用推土机推亮", "用手掌反复推磨，让漆面发亮", "放到太阳下晒亮"], a: 1, tip: "匠人的掌心就是「抛光工具」。" },
+          { q: "平遥推光漆器属于什么？", options: ["电子游戏", "非物质文化遗产 / 传统名漆器", "现代塑料玩具"], a: 1, tip: "它是中国四大名漆器之一。" },
+          { q: "平遥常见的剪纸作品，经常用什么颜色？", options: ["荧光绿", "红色", "透明无色"], a: 1, tip: "红色喜庆，最常见。" },
+        ],
+      },
+      {
+        id: 6,
+        icon: "🍜",
+        title: "任务六：舌尖任务",
+        short: "品尝平遥特色美食，完成美食任务，成为美食小达人！",
+        place: "古城内特色小吃店",
+        content: "寻找并品尝平遥的特色美食，如平遥牛肉、碗托、栲栳栳等。感受这些传统小吃背后的历史和文化。",
+        challenge: "选出最喜欢的平遥小吃，拍一张美食打卡照，再告诉爸爸妈妈味道如何。",
+        knowledge: "平遥牛肉是当地招牌特产；碗托多用荞麦面制成，口感爽滑；栲栳栳是莜面卷成小筒的特色面食，蘸臊子吃很香。",
+        interact: "food",
+        cover: "assets/tasks/task6.jpg",
+        photo: { title: "美食打卡照", hint: "拍平遥牛肉、碗托或栲栳栳，吃之前先打卡！" },
+        quizzes: [
+          { q: "平遥最有名的招牌特产之一是？", options: ["平遥牛肉", "椰子鸡", "小笼包"], a: 0, tip: "咸香紧实，切片不散。" },
+          { q: "碗托主要用什么做成？", options: ["西瓜皮", "荞麦面", "棉花糖"], a: 1, tip: "拌上醋蒜辣椒油更开胃。" },
+          { q: "栲栳栳的外形最像什么？", options: ["小筒 / 窝窝", "大饼", "冰淇淋球"], a: 0, tip: "莜面卷成筒，蘸臊子吃。" },
+        ],
+      },
+      {
+        id: 7,
+        icon: "🌙",
+        title: "任务七：夜间行动",
+        short: "夜游古城或观看《又见平遥》，穿越百年光影！",
+        place: "《又见平遥》剧场 或 古城夜景",
+        content: "观看大型情境体验剧《又见平遥》，通过「行走式」观演，沉浸式感受晋商「走西口」的悲壮与坚韧；或者在夜晚漫步古城，感受华灯初上、古朴宁静的夜景。",
+        challenge: "夜游古城或观演后，拍一张夜景／剧场打卡照，并分享最深印象。",
+        knowledge: "《又见平遥》是沉浸式情境剧，观众边走边看，感受晋商信义与「走西口」故事；夜游古城也能看见华灯映照下的明清街巷。",
+        interact: "night",
+        cover: "assets/tasks/task7.jpg",
+        photo: { title: "夜景打卡照", hint: "拍华灯下的街巷、市楼，或剧场外景（请遵守场馆规定）！" },
+        quizzes: [
+          { q: "《又见平遥》观演方式特别在哪里？", options: ["只能在家里看电视", "观众边走边看，沉浸式体验", "必须闭着眼睛听"], a: 1, tip: "演员就在你身边演出。" },
+          { q: "这部剧主要想让人感受什么？", options: ["晋商走西口的故事与信义精神", "怎么打游戏通关", "如何做数学题"], a: 0, tip: "血脉里的坚持与担当。" },
+          { q: "夜晚漫步古城，最特别的感觉是？", options: ["和白天完全一样", "华灯初上，更有古韵与宁静", "所有店都关门，什么也看不见"], a: 1, tip: "灯火下的青砖灰瓦别有味道。" },
+        ],
+      },
+    ];
+
+    let state = loadState();
+    /** @type {Record<number, { warmUp: boolean, quizIdx: number }>} */
+    let session = {};
+
+    function loadState() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (raw) {
+          const parsed = JSON.parse(raw);
+          return {
+            done: parsed.done || {},
+            notes: parsed.notes || {},
+            challengeOk: parsed.challengeOk || {},
+            photos: parsed.photos || {},
+            nickname: parsed.nickname || "",
+            avatar: parsed.avatar || "",
+            welcomed: !!parsed.welcomed,
+          };
+        }
+      } catch (_) {}
+      return { done: {}, notes: {}, challengeOk: {}, photos: {}, nickname: "", avatar: "", welcomed: false };
+    }
+
+    function saveState() {
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+      } catch (err) {
+        alert("相册存储空间有点满啦，试试换一张更小的照片，或重置进度后再打卡～");
+      }
+    }
+
+    function photoCount() {
+      return TASKS.filter((t) => state.photos[t.id]).length;
+    }
+
+    function updateAlbum() {
+      const title = document.getElementById("albumTitle");
+      const strip = document.getElementById("albumStrip");
+      const items = TASKS.filter((t) => state.photos[t.id]);
+      if (!items.length) {
+        title.classList.remove("show");
+        strip.classList.remove("show");
+        strip.innerHTML = "";
+        return;
+      }
+      title.classList.add("show");
+      strip.classList.add("show");
+      strip.innerHTML = items.map((t) => `
+        <div class="album-item" title="${escapeHtml(t.photo.title)}">
+          <img src="${state.photos[t.id]}" alt="${escapeHtml(t.photo.title)}" />
+          <span>${escapeHtml(t.title.replace(/^任务[一二三四五六七]：/, ""))}</span>
+        </div>
+      `).join("");
+    }
+
+    function canComplete(id) {
+      return !!state.challengeOk[id] && !!state.photos[id] && !state.done[id];
+    }
+
+    function updateCompleteBtn(id) {
+      const btn = document.getElementById("completeBtn");
+      if (!btn) return;
+      if (state.done[id]) {
+        btn.disabled = true;
+        btn.textContent = "✓ 已完成";
+      } else if (canComplete(id)) {
+        btn.disabled = false;
+        btn.textContent = "完成任务 ✓";
+      } else if (state.challengeOk[id] && !state.photos[id]) {
+        btn.disabled = true;
+        btn.textContent = "先拍照打卡";
+      } else {
+        btn.disabled = true;
+        btn.textContent = "完成任务 ✓";
+      }
+    }
+
+    function doneCount() {
+      return TASKS.filter((t) => state.done[t.id]).length;
+    }
+
+    function updateProgress() {
+      const n = doneCount();
+      const total = TASKS.length;
+      document.getElementById("progressText").textContent = `${n} / ${total}`;
+      document.getElementById("progressFill").style.width = `${(n / total) * 100}%`;
+      document.querySelector(".progress-bar").setAttribute("aria-valuenow", String(n));
+
+      const pill = document.getElementById("statusPill");
+      const statusText = document.getElementById("statusText");
+      const ready = document.getElementById("readyPill");
+      const banner = document.getElementById("rewardBanner");
+
+      if (n === total) {
+        pill.classList.add("all-done");
+        statusText.textContent = "特工状态：全部任务完成！";
+        ready.textContent = `荣誉称号已解锁 · 打卡 ${photoCount()} 张 🏅`;
+        banner.classList.add("show");
+        document.getElementById("reportBtn").classList.add("show");
+      } else {
+        pill.classList.remove("all-done");
+        statusText.textContent = n === 0 ? "特工状态：待命出发" : "特工状态：任务进行中";
+        ready.textContent = n === 0
+          ? "准备好接受任务了吗？"
+          : `继续加油！还剩 ${total - n} 项 · 已打卡 ${photoCount()} 张`;
+        banner.classList.remove("show");
+        document.getElementById("reportBtn").classList.remove("show");
+      }
+      updateAlbum();
+      updateAgentBar();
+    }
+
+    function updateAgentBar() {
+      const bar = document.getElementById("agentBar");
+      if (!state.nickname || !state.avatar) {
+        bar.classList.remove("show");
+        return;
+      }
+      bar.classList.add("show");
+      document.getElementById("agentAvatarImg").src = state.avatar;
+      document.getElementById("agentNameText").textContent = state.nickname;
+      const role = bar.querySelector(".agent-role");
+      if (role) {
+        role.textContent = doneCount() === TASKS.length
+          ? "古城时空小特工 · 全部通关"
+          : "古城时空小特工 · 任务进行中";
+      }
+    }
+
+    function renderGrid() {
+      const grid = document.getElementById("taskGrid");
+      grid.innerHTML = TASKS.map((t) => {
+        const done = !!state.done[t.id];
+        const photo = state.photos[t.id];
+        const artStyle = photo ? ` style="background-image:url('${photo}')"` : "";
+        const artClass = photo ? "card-art has-photo" : "card-art";
+        const cover = t.cover || "";
+        return `
+          <button type="button" class="task-card${done ? " done" : ""}" data-id="${t.id}" aria-label="${t.title}${done ? "（已完成）" : ""}">
+            <div class="card-top">
+              <span class="card-icon" aria-hidden="true">${t.icon}</span>
+              <div>
+                <div class="card-num">MISSION 0${t.id}</div>
+                <div class="card-title">${t.title.replace(/^任务[一二三四五六七]：/, "")}</div>
+              </div>
+            </div>
+            <div class="${artClass}"${artStyle} aria-hidden="true">
+              ${cover ? `<img class="art-cover" src="${cover}" alt="" loading="lazy" />` : `<span class="art-emoji">${t.icon}</span>`}
+              ${photo ? `<span class="card-photo-badge">已打卡</span>` : ""}
+            </div>
+            <p class="card-desc">${t.short}</p>
+            <span class="card-check" aria-hidden="true"></span>
+          </button>`;
+      }).join("");
+
+      grid.querySelectorAll(".task-card").forEach((btn) => {
+        btn.addEventListener("click", () => openTask(Number(btn.dataset.id)));
+      });
+    }
+
+    function openTask(id) {
+      const task = TASKS.find((t) => t.id === id);
+      if (!task) return;
+
+      if (!session[id]) session[id] = { warmUp: false, quizIdx: 0 };
+
+      document.getElementById("taskIcon").textContent = task.icon;
+      document.getElementById("taskTitle").textContent = task.title;
+      document.getElementById("taskPlace").textContent = `📍 ${task.place}`;
+
+      const hero = document.getElementById("taskHero");
+      const heroImg = document.getElementById("taskHeroImg");
+      if (task.cover) {
+        heroImg.src = task.cover;
+        heroImg.alt = task.title;
+        hero.classList.add("show");
+      } else {
+        hero.classList.remove("show");
+        heroImg.removeAttribute("src");
+      }
+
+      const note = state.notes[id] || "";
+      const challenged = !!state.challengeOk[id];
+      const done = !!state.done[id];
+
+      document.getElementById("taskBody").innerHTML = `
+        <div class="info-block">
+          <h3>🎯 任务内容</h3>
+          <p>${task.content}</p>
+        </div>
+        <div class="info-block challenge-box">
+          <h3>⭐ 实地挑战 · 拍照打卡</h3>
+          <p>${task.challenge}</p>
+        </div>
+        <div class="info-block knowledge-box">
+          <h3>📚 知识点</h3>
+          <p>${task.knowledge}</p>
+        </div>
+        <div class="interact-zone" id="interactZone">
+          ${renderInteract(task, challenged, note)}
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="btn-ghost" data-close="taskOverlay">稍后再说</button>
+          <button type="button" class="btn-primary" id="completeBtn" style="margin-left:auto">完成任务 ✓</button>
+        </div>
+        ${note ? `<p class="note-log" style="color:rgba(232,238,245,0.55)">你的记录：${escapeHtml(note)}</p>` : ""}
+      `;
+
+      updateCompleteBtn(id);
+      if (challenged) {
+        bindPhoto(task);
+      } else {
+        bindInteract(task);
+      }
+      const completeBtn = document.getElementById("completeBtn");
+      if (completeBtn && !done) {
+        completeBtn.addEventListener("click", () => completeTask(task.id));
+      }
+
+      openOverlay("taskOverlay");
+    }
+
+    function escapeHtml(s) {
+      return String(s)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;");
+    }
+
+    function renderPhotoCheckin(task) {
+      const photo = state.photos[task.id];
+      const p = task.photo || { title: "打卡照", hint: "拍一张照片完成打卡吧！" };
+      return `
+        <div class="photo-box" id="photoBox">
+          <span class="step-label">STEP 3 · 拍照打卡</span>
+          <h3>📷 ${escapeHtml(p.title)}</h3>
+          <p class="hint">${escapeHtml(p.hint)}</p>
+          <div class="photo-actions">
+            <label class="btn-photo primary">
+              📸 拍照
+              <input type="file" id="photoCamera" accept="image/*" capture="environment" />
+            </label>
+            <label class="btn-photo">
+              🖼️ 相册上传
+              <input type="file" id="photoAlbum" accept="image/*" />
+            </label>
+            ${photo ? `<button type="button" id="photoClear">换一张</button>` : ""}
+          </div>
+          <div class="photo-preview-wrap${photo ? " show" : ""}" id="photoPreviewWrap">
+            ${photo ? `<img id="photoPreview" src="${photo}" alt="打卡照片" />` : `<img id="photoPreview" alt="打卡照片" />`}
+            <span class="photo-stamp">时空特工 · 已打卡</span>
+          </div>
+        </div>
+      `;
+    }
+
+    function compressImage(file, maxSide = 960, quality = 0.72) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onerror = () => reject(new Error("read fail"));
+        reader.onload = () => {
+          const img = new Image();
+          img.onload = () => {
+            let { width, height } = img;
+            const scale = Math.min(1, maxSide / Math.max(width, height));
+            width = Math.round(width * scale);
+            height = Math.round(height * scale);
+            const canvas = document.createElement("canvas");
+            canvas.width = width;
+            canvas.height = height;
+            const ctx = canvas.getContext("2d");
+            ctx.drawImage(img, 0, 0, width, height);
+            resolve(canvas.toDataURL("image/jpeg", quality));
+          };
+          img.onerror = () => reject(new Error("img fail"));
+          img.src = reader.result;
+        };
+        reader.readAsDataURL(file);
+      });
+    }
+
+    function bindPhoto(task) {
+      const id = task.id;
+      const applyPhoto = async (file) => {
+        if (!file || !file.type.startsWith("image/")) {
+          showFeedback(false, "请选择一张图片哦～");
+          return;
+        }
+        try {
+          const dataUrl = await compressImage(file);
+          state.photos[id] = dataUrl;
+          saveState();
+          const wrap = document.getElementById("photoPreviewWrap");
+          const img = document.getElementById("photoPreview");
+          if (img) img.src = dataUrl;
+          if (wrap) wrap.classList.add("show");
+          updateCompleteBtn(id);
+          updateAlbum();
+          renderGrid();
+          showFeedback(true, "打卡照片已保存！可以点「完成任务」啦 📷");
+          playBeep(988, 0.08);
+        } catch (_) {
+          showFeedback(false, "照片处理失败，换一张再试试～");
+        }
+      };
+
+      document.getElementById("photoCamera")?.addEventListener("change", (e) => {
+        const file = e.target.files?.[0];
+        if (file) applyPhoto(file);
+      });
+      document.getElementById("photoAlbum")?.addEventListener("change", (e) => {
+        const file = e.target.files?.[0];
+        if (file) applyPhoto(file);
+      });
+      document.getElementById("photoClear")?.addEventListener("click", () => {
+        delete state.photos[id];
+        saveState();
+        const wrap = document.getElementById("photoPreviewWrap");
+        const img = document.getElementById("photoPreview");
+        if (img) img.removeAttribute("src");
+        if (wrap) wrap.classList.remove("show");
+        updateCompleteBtn(id);
+        updateAlbum();
+        renderGrid();
+        showFeedback(false, "已清除，重新拍一张吧～");
+      });
+    }
+
+    function renderWarmUp(task) {
+      switch (task.interact) {
+        case "wall":
+          return `
+            <span class="step-label">STEP 1 · 热身闯关</span>
+            <h3>🔎 找出「平遥」砖</h3>
+            <p class="hint">模拟城墙上哪块砖刻着「平遥」二字？</p>
+            <div class="choice-grid" id="warmChoices">
+              <button type="button" class="choice-btn" data-ok="0">砖块 A：刻着「太原」</button>
+              <button type="button" class="choice-btn" data-ok="1">砖块 B：刻着「平遥」</button>
+              <button type="button" class="choice-btn" data-ok="0">砖块 C：刻着「晋商」</button>
+            </div>`;
+        case "abacus":
+          return `
+            <span class="step-label">STEP 1 · 热身闯关</span>
+            <h3>🧮 拨动算盘</h3>
+            <p class="hint">点拨至少 3 颗珠子，感受账房先生的手艺！</p>
+            <div class="abacus" id="abacus">
+              ${[0, 1, 2, 3, 4].map((c) => `
+                <div class="bead-col">
+                  <button type="button" class="bead" data-col="${c}" aria-label="拨动第${c + 1}列"></button>
+                  <button type="button" class="bead" data-col="${c}" aria-label="拨动第${c + 1}列下珠"></button>
+                </div>`).join("")}
+            </div>
+            <p class="hint" id="beadCount">已拨动：0 / 3</p>
+            <button type="button" class="btn-primary" id="abacusSubmit" disabled>确认拨算完成</button>`;
+        case "escort":
+          return `
+            <span class="step-label">STEP 1 · 热身闯关</span>
+            <h3>⚔️ 镖师 POSE</h3>
+            <p class="hint">选出最像「护送镖车」的姿势！</p>
+            <div class="pose-grid" id="poseGrid">
+              <button type="button" class="pose-btn" data-ok="0" aria-label="睡觉">😴</button>
+              <button type="button" class="pose-btn" data-ok="1" aria-label="仗剑">⚔️</button>
+              <button type="button" class="pose-btn" data-ok="0" aria-label="吃饭">🍜</button>
+            </div>`;
+        case "yamen":
+          return `
+            <span class="step-label">STEP 1 · 热身闯关</span>
+            <h3>🕵️ 搜集证据</h3>
+            <p class="hint">小捕快先找对证物：县衙大堂高挂的是哪块匾？</p>
+            <div class="choice-grid" id="warmChoices">
+              <button type="button" class="choice-btn" data-ok="0">「欢迎光临」</button>
+              <button type="button" class="choice-btn" data-ok="1">「明镜高悬」</button>
+              <button type="button" class="choice-btn" data-ok="0">「今日特价」</button>
+            </div>`;
+        case "heritage":
+          return `
+            <span class="step-label">STEP 1 · 热身闯关</span>
+            <h3>🎁 非遗心头好</h3>
+            <p class="hint">选出最喜欢的非遗，并写一句理由（至少 4 个字）。</p>
+            <div class="choice-grid" style="margin-bottom:0.65rem" id="heritagePick">
+              <button type="button" class="choice-btn" data-pick="推光漆器">✨ 推光漆器</button>
+              <button type="button" class="choice-btn" data-pick="剪纸">✂️ 平遥剪纸</button>
+              <button type="button" class="choice-btn" data-pick="其他非遗">🧵 其他非遗</button>
+            </div>
+            <div class="input-row">
+              <input type="text" id="heritageWhy" placeholder="例如：亮得像镜子" maxlength="40" />
+              <button type="button" class="btn-primary" id="heritageSubmit">提交</button>
+            </div>`;
+        case "food":
+          return `
+            <span class="step-label">STEP 1 · 热身闯关</span>
+            <h3>🍜 美食打卡</h3>
+            <p class="hint">选出最爱小吃并打星！</p>
+            <div class="input-row" style="margin-bottom:0.5rem">
+              <select id="foodSelect">
+                <option value="">— 选择美食 —</option>
+                <option>平遥牛肉</option>
+                <option>碗托</option>
+                <option>栲栳栳</option>
+                <option>其他小吃</option>
+              </select>
+            </div>
+            <div class="star-rate" id="starRate" aria-label="味道评分">
+              ${[1, 2, 3, 4, 5].map((n) => `<button type="button" data-star="${n}" aria-label="${n}星">⭐</button>`).join("")}
+            </div>
+            <button type="button" class="btn-primary" id="foodSubmit">提交美食任务</button>`;
+        case "night":
+          return `
+            <span class="step-label">STEP 1 · 热身闯关</span>
+            <h3>🌙 光影印象</h3>
+            <p class="hint">写下印象最深的场景／人物（至少 6 个字）。</p>
+            <div class="input-row" style="flex-direction:column">
+              <textarea id="nightNote" placeholder="例如：走西口的晋商很勇敢……" maxlength="80"></textarea>
+              <button type="button" class="btn-primary" id="nightSubmit">提交印象</button>
+            </div>`;
+        default:
+          return "";
+      }
+    }
+
+    function renderQuizPanel(task, unlocked, quizIdx) {
+      const quizzes = task.quizzes || [];
+      const q = quizzes[quizIdx];
+      if (!q) return "";
+
+      const dots = quizzes.map((_, i) => {
+        let cls = "quiz-dot";
+        if (i < quizIdx) cls += " done";
+        if (i === quizIdx) cls += " on";
+        return `<span class="${cls}"></span>`;
+      }).join("");
+
+      return `
+        <div id="quizLocked" class="${unlocked ? "unlocked" : ""}" style="margin-top:1rem;padding-top:0.85rem;border-top:1px dashed rgba(61,213,255,0.25)">
+          <span class="step-label">STEP 2 · 知识问答 ${quizIdx + 1}/${quizzes.length}</span>
+          <p class="hint" style="margin-bottom:0.5rem">${unlocked ? "答对全部题目才能完成特工认证！" : "先完成上面的热身闯关，才能解锁问答～"}</p>
+          <div class="quiz-progress">${dots}</div>
+          <div class="quiz-q">${escapeHtml(q.q)}</div>
+          <div class="choice-grid" id="quizChoices">
+            ${q.options.map((opt, i) => `
+              <button type="button" class="choice-btn" data-idx="${i}">${escapeHtml(opt)}</button>
+            `).join("")}
+          </div>
+          <p class="quiz-tip" id="quizTip">💡 ${escapeHtml(q.tip || "")}</p>
+        </div>`;
+    }
+
+    function renderInteract(task, challenged, note) {
+      if (challenged) {
+        return `
+          <h3>✅ 问答挑战已通过</h3>
+          <p class="hint">热身 + 知识问答过关！再完成下面的拍照打卡，就能点「完成任务」。</p>
+          <div class="feedback ok show" id="interactFeedback">特工认证进行中！${note ? "记录：" + escapeHtml(note) : ""}</div>
+          ${renderPhotoCheckin(task)}
+        `;
+      }
+
+      const s = session[task.id] || { warmUp: false, quizIdx: 0 };
+      return `
+        <div id="warmUpBlock">${renderWarmUp(task)}</div>
+        <p class="warmup-done-tag${s.warmUp ? " show" : ""}" id="warmDoneTag">✅ 热身完成！继续挑战知识问答 ↓</p>
+        <div class="feedback" id="interactFeedback"></div>
+        ${renderQuizPanel(task, s.warmUp, s.quizIdx)}
+      `;
+    }
+
+    function showFeedback(ok, msg) {
+      const el = document.getElementById("interactFeedback");
+      if (!el) return;
+      el.className = `feedback show ${ok ? "ok" : "bad"}`;
+      el.textContent = msg;
+    }
+
+    function unlockQuiz(taskId) {
+      session[taskId] = session[taskId] || { warmUp: false, quizIdx: 0 };
+      session[taskId].warmUp = true;
+      const tag = document.getElementById("warmDoneTag");
+      if (tag) tag.classList.add("show");
+      const quiz = document.getElementById("quizLocked");
+      if (quiz) quiz.classList.add("unlocked");
+      showFeedback(true, "热身成功！开始知识问答吧 📚");
+      playBeep(740, 0.08);
+    }
+
+    function passChallenge(taskId, note) {
+      state.challengeOk[taskId] = true;
+      if (note) state.notes[taskId] = note;
+      saveState();
+      playBeep(880, 0.08);
+      setTimeout(() => playBeep(1175, 0.1), 100);
+
+      const task = TASKS.find((t) => t.id === taskId);
+      const zone = document.getElementById("interactZone");
+      if (zone && task) {
+        zone.innerHTML = `
+          <h3>✅ 问答挑战已通过</h3>
+          <p class="hint">太棒了！现在进入拍照打卡，拍好照才能完成任务。</p>
+          <div class="feedback ok show" id="interactFeedback">问答全对！请拍照打卡 📷</div>
+          ${renderPhotoCheckin(task)}
+        `;
+        bindPhoto(task);
+      }
+      updateCompleteBtn(taskId);
+    }
+
+    function bindQuiz(task) {
+      const id = task.id;
+      const quizzes = task.quizzes || [];
+
+      document.querySelectorAll("#quizChoices .choice-btn").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          if (!session[id]?.warmUp) {
+            showFeedback(false, "先完成热身闯关再答问哦！");
+            return;
+          }
+          const idx = Number(btn.dataset.idx);
+          const q = quizzes[session[id].quizIdx];
+          if (!q) return;
+
+          if (idx === q.a) {
+            btn.classList.add("correct");
+            document.querySelectorAll("#quizChoices .choice-btn").forEach((b) => { b.disabled = true; });
+            playBeep(880, 0.07);
+            session[id].quizIdx += 1;
+
+            if (session[id].quizIdx >= quizzes.length) {
+              const note = state.notes[id] || `问答 ${quizzes.length} 题全对`;
+              passChallenge(id, note);
+            } else {
+              showFeedback(true, `答对了！还有 ${quizzes.length - session[id].quizIdx} 题～`);
+              setTimeout(() => {
+                const zone = document.getElementById("interactZone");
+                if (!zone || state.challengeOk[id]) return;
+                // keep warm-up visually done: re-render quiz part only
+                const warm = document.getElementById("warmUpBlock");
+                const warmHtml = warm ? warm.innerHTML : "";
+                zone.innerHTML = `
+                  <div id="warmUpBlock">${warmHtml}</div>
+                  <p class="warmup-done-tag show" id="warmDoneTag">✅ 热身完成！继续挑战知识问答 ↓</p>
+                  <div class="feedback ok show" id="interactFeedback">继续加油！</div>
+                  ${renderQuizPanel(task, true, session[id].quizIdx)}
+                `;
+                // disable warm-up controls
+                zone.querySelectorAll("#warmUpBlock button, #warmUpBlock input, #warmUpBlock textarea, #warmUpBlock select").forEach((el) => {
+                  el.disabled = true;
+                });
+                bindQuiz(task);
+              }, 450);
+            }
+          } else {
+            btn.classList.add("wrong");
+            const tip = document.getElementById("quizTip");
+            if (tip) tip.classList.add("show");
+            showFeedback(false, "再想想～ 读一读上面的知识点，换个答案！");
+            playBeep(220, 0.15);
+            setTimeout(() => btn.classList.remove("wrong"), 500);
+          }
+        });
+      });
+    }
+
+    function bindInteract(task) {
+      const id = task.id;
+      session[id] = session[id] || { warmUp: false, quizIdx: 0 };
+      let warmNote = "";
+
+      const finishWarm = (note) => {
+        if (session[id].warmUp) return;
+        if (note) {
+          warmNote = note;
+          state.notes[id] = note;
+          saveState();
+        }
+        unlockQuiz(id);
+        document.querySelectorAll("#warmUpBlock button, #warmUpBlock input, #warmUpBlock textarea, #warmUpBlock select").forEach((el) => {
+          el.disabled = true;
+        });
+      };
+
+      if (task.interact === "wall" || task.interact === "yamen") {
+        document.querySelectorAll("#warmChoices .choice-btn").forEach((btn) => {
+          btn.addEventListener("click", () => {
+            const ok = btn.dataset.ok === "1";
+            if (ok) {
+              document.querySelectorAll("#warmChoices .choice-btn").forEach((b) => {
+                b.disabled = true;
+                if (b.dataset.ok === "1") b.classList.add("correct");
+              });
+              finishWarm(task.interact === "wall" ? "找到「平遥」砖" : "找到「明镜高悬」");
+            } else {
+              btn.classList.add("wrong");
+              showFeedback(false, "再找找看～");
+              playBeep(220, 0.12);
+              setTimeout(() => btn.classList.remove("wrong"), 500);
+            }
+          });
+        });
+      }
+
+      if (task.interact === "abacus") {
+        document.querySelectorAll("#abacus .bead").forEach((bead) => {
+          bead.addEventListener("click", () => {
+            bead.classList.toggle("active");
+            const count = document.querySelectorAll("#abacus .bead.active").length;
+            document.getElementById("beadCount").textContent = `已拨动：${count} / 3`;
+            document.getElementById("abacusSubmit").disabled = count < 3;
+            playBeep(520 + count * 40, 0.04);
+          });
+        });
+        document.getElementById("abacusSubmit")?.addEventListener("click", () => {
+          finishWarm("拨动算盘体验完成");
+        });
+      }
+
+      if (task.interact === "escort") {
+        document.querySelectorAll("#poseGrid .pose-btn").forEach((btn) => {
+          btn.addEventListener("click", () => {
+            document.querySelectorAll("#poseGrid .pose-btn").forEach((b) => b.classList.remove("selected"));
+            btn.classList.add("selected");
+            if (btn.dataset.ok === "1") {
+              finishWarm("镖师POSE打卡");
+            } else {
+              showFeedback(false, "选仗剑护镖的姿势再试～");
+              playBeep(220, 0.12);
+            }
+          });
+        });
+      }
+
+      if (task.interact === "heritage") {
+        let pick = "";
+        document.querySelectorAll("#heritagePick .choice-btn").forEach((btn) => {
+          btn.addEventListener("click", () => {
+            document.querySelectorAll("#heritagePick .choice-btn").forEach((b) => b.classList.remove("correct"));
+            btn.classList.add("correct");
+            pick = btn.dataset.pick;
+          });
+        });
+        document.getElementById("heritageSubmit")?.addEventListener("click", () => {
+          const why = (document.getElementById("heritageWhy").value || "").trim();
+          if (!pick) { showFeedback(false, "先选一件非遗作品哦！"); return; }
+          if (why.length < 4) { showFeedback(false, "理由至少写 4 个字～"); return; }
+          finishWarm(`${pick}：${why}`);
+        });
+      }
+
+      if (task.interact === "food") {
+        let stars = 0;
+        document.querySelectorAll("#starRate button").forEach((btn) => {
+          btn.addEventListener("click", () => {
+            stars = Number(btn.dataset.star);
+            document.querySelectorAll("#starRate button").forEach((b) => {
+              b.classList.toggle("on", Number(b.dataset.star) <= stars);
+            });
+          });
+        });
+        document.getElementById("foodSubmit")?.addEventListener("click", () => {
+          const food = document.getElementById("foodSelect").value;
+          if (!food) { showFeedback(false, "先选出一道美食吧！"); return; }
+          if (stars < 1) { showFeedback(false, "给味道打个星吧～"); return; }
+          finishWarm(`${food} ${"⭐".repeat(stars)}`);
+        });
+      }
+
+      if (task.interact === "night") {
+        document.getElementById("nightSubmit")?.addEventListener("click", () => {
+          const note = (document.getElementById("nightNote").value || "").trim();
+          if (note.length < 6) { showFeedback(false, "再多写一点（至少 6 个字）～"); return; }
+          finishWarm(note);
+        });
+      }
+
+      // restore unlocked quiz if warm-up already done this session
+      if (session[id].warmUp) {
+        document.getElementById("quizLocked")?.classList.add("unlocked");
+        document.getElementById("warmDoneTag")?.classList.add("show");
+        document.querySelectorAll("#warmUpBlock button, #warmUpBlock input, #warmUpBlock textarea, #warmUpBlock select").forEach((el) => {
+          el.disabled = true;
+        });
+      }
+
+      bindQuiz(task);
+    }
+
+    function completeTask(id) {
+      if (!state.challengeOk[id]) return;
+      if (!state.photos[id]) {
+        showFeedback(false, "还没拍照打卡哦，先拍一张再完成任务～");
+        document.getElementById("photoBox")?.scrollIntoView({ behavior: "smooth", block: "center" });
+        return;
+      }
+      const already = !!state.done[id];
+      state.done[id] = true;
+      saveState();
+      renderGrid();
+      updateProgress();
+      closeOverlay("taskOverlay");
+
+      if (!already) {
+        burstConfetti();
+        playBeep(660, 0.08);
+        setTimeout(() => playBeep(880, 0.1), 90);
+        setTimeout(() => playBeep(1320, 0.12), 180);
+      }
+
+      if (doneCount() === TASKS.length) {
+        setTimeout(() => {
+          burstConfetti(40);
+          openReward();
+        }, 400);
+      }
+    }
+
+    function openReward() {
+      document.getElementById("taskIcon").textContent = "🏅";
+      document.getElementById("taskTitle").textContent = "荣誉称号已解锁！";
+      document.getElementById("taskPlace").textContent = state.nickname
+        ? `特工 ${state.nickname}`
+        : "古城时空小特工";
+      document.getElementById("taskHero")?.classList.remove("show");
+      document.getElementById("taskBody").innerHTML = `
+        <div class="welcome-art">🎉🐉🏯🐉🎉</div>
+        <div class="info-block challenge-box">
+          <h3>🏅 恭喜你${state.nickname ? "，" + escapeHtml(state.nickname) : ""}</h3>
+          <p>你完成了全部 7 项时空任务，并留下 ${photoCount()} 张打卡照，正式成为「古城时空小特工」！现在可以生成专属图文任务报告，给爸爸妈妈看哦～</p>
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="btn-ghost" data-close="taskOverlay">稍后再看</button>
+          <button type="button" class="btn-primary" id="openReportFromReward" style="margin-left:auto">📄 生成任务报告</button>
+        </div>`;
+      openOverlay("taskOverlay");
+      document.getElementById("openReportFromReward")?.addEventListener("click", () => {
+        closeOverlay("taskOverlay");
+        openReport();
+      });
+    }
+
+    function formatReportDate() {
+      const d = new Date();
+      return `${d.getFullYear()}年${d.getMonth() + 1}月${d.getDate()}日`;
+    }
+
+    function openReport() {
+      if (doneCount() < TASKS.length) {
+        alert("先完成全部任务，才能生成报告哦！");
+        return;
+      }
+      const name = state.nickname || "时空小特工";
+      const avatar = state.avatar || "";
+      const entries = TASKS.map((t) => {
+        const photo = state.photos[t.id];
+        const note = state.notes[t.id];
+        const story = REPORT_COPY[t.id] || t.short;
+        return `
+          <article class="report-entry">
+            <h4>${t.icon} ${escapeHtml(t.title)}</h4>
+            <div class="place">📍 ${escapeHtml(t.place)}</div>
+            ${photo ? `<img src="${photo}" alt="${escapeHtml(t.photo.title)}" crossorigin="anonymous" />` : `<p class="caption">（本关暂无打卡照片）</p>`}
+            <p class="caption">${escapeHtml(story)}</p>
+            ${note ? `<p class="note">特工手记：${escapeHtml(note)}</p>` : ""}
+          </article>`;
+      }).join("");
+
+      document.getElementById("reportBody").innerHTML = `
+        <div id="reportCapture">
+          <div class="report-hero">
+            ${avatar ? `<img src="${avatar}" alt="头像" />` : `<div style="width:72px;height:72px;border-radius:50%;background:#1a2838;display:grid;place-items:center;font-size:2rem;border:2px solid rgba(61,213,255,0.35)">🕵️</div>`}
+            <div>
+              <h3>${escapeHtml(name)}</h3>
+              <div class="sub">平遥古城 · 时空特工任务报告<br />签发日期：${formatReportDate()}</div>
+            </div>
+          </div>
+          <p class="report-summary">
+            兹证明特工「${escapeHtml(name)}」已圆满完成平遥古城全部 7 项时空任务，累计打卡照片 ${photoCount()} 张。
+            途经城墙、票号、镖局、县衙、非遗、美食与夜间光影，以好奇之心探索晋商故里，以镜头记录文化之美。
+            特授予荣誉称号——古城时空小特工。
+          </p>
+          ${entries}
+          <div class="report-footer">
+            <strong>🏅 古城时空小特工</strong>
+            把这份报告讲给爸爸妈妈听，兑换一份神秘奖励吧！<br />
+            —— 平遥古城时空特工系统
+          </div>
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="btn-ghost" data-close="reportOverlay">关闭</button>
+          <button type="button" class="btn-primary" id="saveReportImgBtn" style="margin-left:auto">🖼️ 保存为图片</button>
+        </div>
+        <p class="save-img-status" id="saveImgStatus">正在生成图片，请稍候…</p>
+      `;
+      openOverlay("reportOverlay");
+      document.getElementById("saveReportImgBtn")?.addEventListener("click", () => saveReportAsImage());
+    }
+
+    function loadImage(src) {
+      return new Promise((resolve) => {
+        if (!src) { resolve(null); return; }
+        const img = new Image();
+        img.onload = () => resolve(img);
+        img.onerror = () => resolve(null);
+        img.src = src;
+      });
+    }
+
+    function wrapText(ctx, text, maxWidth) {
+      const chars = String(text || "").split("");
+      const lines = [];
+      let line = "";
+      for (const ch of chars) {
+        const test = line + ch;
+        if (ctx.measureText(test).width > maxWidth && line) {
+          lines.push(line);
+          line = ch;
+        } else {
+          line = test;
+        }
+      }
+      if (line) lines.push(line);
+      return lines.length ? lines : [""];
+    }
+
+    function roundRect(ctx, x, y, w, h, r) {
+      const radius = Math.min(r, w / 2, h / 2);
+      ctx.beginPath();
+      ctx.moveTo(x + radius, y);
+      ctx.arcTo(x + w, y, x + w, y + h, radius);
+      ctx.arcTo(x + w, y + h, x, y + h, radius);
+      ctx.arcTo(x, y + h, x, y, radius);
+      ctx.arcTo(x, y, x + w, y, radius);
+      ctx.closePath();
+    }
+
+    function drawCover(ctx, img, x, y, w, h, r = 12) {
+      ctx.save();
+      roundRect(ctx, x, y, w, h, r);
+      ctx.clip();
+      if (img) {
+        const scale = Math.max(w / img.width, h / img.height);
+        const dw = img.width * scale;
+        const dh = img.height * scale;
+        ctx.drawImage(img, x + (w - dw) / 2, y + (h - dh) / 2, dw, dh);
+      } else {
+        ctx.fillStyle = "#1a2838";
+        ctx.fillRect(x, y, w, h);
+      }
+      ctx.restore();
+      ctx.strokeStyle = "rgba(61,213,255,0.35)";
+      ctx.lineWidth = 2;
+      roundRect(ctx, x, y, w, h, r);
+      ctx.stroke();
+    }
+
+    async function saveReportAsImage() {
+      const btn = document.getElementById("saveReportImgBtn");
+      const status = document.getElementById("saveImgStatus");
+      if (btn) {
+        btn.disabled = true;
+        btn.textContent = "生成中…";
+      }
+      if (status) status.classList.add("show");
+
+      try {
+        const name = state.nickname || "时空小特工";
+        const W = 750;
+        const pad = 36;
+        const contentW = W - pad * 2;
+
+        const avatarImg = await loadImage(state.avatar);
+        const photoImgs = {};
+        for (const t of TASKS) {
+          if (state.photos[t.id]) photoImgs[t.id] = await loadImage(state.photos[t.id]);
+        }
+
+        // Measure height with a temp canvas
+        const measure = document.createElement("canvas").getContext("2d");
+        let y = pad;
+
+        y += 90; // hero
+        measure.font = "500 28px 'Noto Sans SC', sans-serif";
+        const summary = `兹证明特工「${name}」已圆满完成平遥古城全部 7 项时空任务，累计打卡照片 ${photoCount()} 张。途经城墙、票号、镖局、县衙、非遗、美食与夜间光影，以好奇之心探索晋商故里，以镜头记录文化之美。特授予荣誉称号——古城时空小特工。`;
+        y += 24 + wrapText(measure, summary, contentW - 32).length * 30 + 28;
+
+        for (const t of TASKS) {
+          y += 36; // title
+          y += 26; // place
+          y += state.photos[t.id] ? 280 : 36;
+          measure.font = "400 26px 'Noto Sans SC', sans-serif";
+          const story = REPORT_COPY[t.id] || t.short;
+          y += wrapText(measure, story, contentW).length * 30 + 8;
+          if (state.notes[t.id]) {
+            measure.font = "italic 24px 'Noto Sans SC', sans-serif";
+            y += wrapText(measure, `特工手记：${state.notes[t.id]}`, contentW).length * 28 + 8;
+          }
+          y += 28;
+        }
+        y += 120; // footer
+        y += pad;
+
+        const H = Math.ceil(y);
+        const canvas = document.createElement("canvas");
+        const scale = 2;
+        canvas.width = W * scale;
+        canvas.height = H * scale;
+        const ctx = canvas.getContext("2d");
+        ctx.scale(scale, scale);
+
+        // background
+        const bg = ctx.createLinearGradient(0, 0, 0, H);
+        bg.addColorStop(0, "#0e1a28");
+        bg.addColorStop(1, "#101018");
+        ctx.fillStyle = bg;
+        ctx.fillRect(0, 0, W, H);
+
+        // cyan frame
+        ctx.strokeStyle = "rgba(61,213,255,0.45)";
+        ctx.lineWidth = 3;
+        roundRect(ctx, 12, 12, W - 24, H - 24, 18);
+        ctx.stroke();
+
+        let cy = pad;
+
+        // hero
+        if (avatarImg) {
+          ctx.save();
+          ctx.beginPath();
+          ctx.arc(pad + 40, cy + 40, 40, 0, Math.PI * 2);
+          ctx.closePath();
+          ctx.clip();
+          const scale = Math.max(80 / avatarImg.width, 80 / avatarImg.height);
+          const dw = avatarImg.width * scale;
+          const dh = avatarImg.height * scale;
+          ctx.drawImage(avatarImg, pad + 40 - dw / 2, cy + 40 - dh / 2, dw, dh);
+          ctx.restore();
+          ctx.strokeStyle = "#f0c14b";
+          ctx.lineWidth = 3;
+          ctx.beginPath();
+          ctx.arc(pad + 40, cy + 40, 40, 0, Math.PI * 2);
+          ctx.stroke();
+        } else {
+          ctx.fillStyle = "#1a2838";
+          ctx.beginPath();
+          ctx.arc(pad + 40, cy + 40, 40, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.strokeStyle = "rgba(61,213,255,0.45)";
+          ctx.lineWidth = 2;
+          ctx.stroke();
+          ctx.fillStyle = "#7ae7ff";
+          ctx.font = "36px sans-serif";
+          ctx.textAlign = "center";
+          ctx.fillText("🕵️", pad + 40, cy + 52);
+          ctx.textAlign = "left";
+        }
+
+        ctx.fillStyle = "#f4f8fc";
+        ctx.font = "400 40px 'Ma Shan Zheng', 'Noto Sans SC', cursive";
+        ctx.fillText(name, pad + 100, cy + 36);
+        ctx.fillStyle = "#3dd5ff";
+        ctx.font = "500 22px 'Noto Sans SC', sans-serif";
+        ctx.fillText("平遥古城 · 时空特工任务报告", pad + 100, cy + 66);
+        ctx.fillStyle = "rgba(232,238,245,0.7)";
+        ctx.font = "400 20px 'Noto Sans SC', sans-serif";
+        ctx.fillText(`签发日期：${formatReportDate()}`, pad + 100, cy + 92);
+        cy += 110;
+
+        // summary box
+        ctx.fillStyle = "rgba(61,213,255,0.1)";
+        ctx.strokeStyle = "rgba(61,213,255,0.25)";
+        ctx.lineWidth = 1.5;
+        measure.font = "500 24px 'Noto Sans SC', sans-serif";
+        const sumLines = wrapText(measure, summary, contentW - 32);
+        const sumH = 24 + sumLines.length * 30 + 16;
+        roundRect(ctx, pad, cy, contentW, sumH, 12);
+        ctx.fill();
+        ctx.stroke();
+        ctx.fillStyle = "rgba(232,238,245,0.9)";
+        ctx.font = "500 24px 'Noto Sans SC', sans-serif";
+        let ty = cy + 28;
+        for (const line of sumLines) {
+          ctx.fillText(line, pad + 16, ty);
+          ty += 30;
+        }
+        cy += sumH + 28;
+
+        // entries
+        for (const t of TASKS) {
+          ctx.fillStyle = "#f2f6fa";
+          ctx.font = "700 28px 'Noto Sans SC', sans-serif";
+          ctx.fillText(`${t.icon} ${t.title}`, pad, cy);
+          cy += 34;
+          ctx.fillStyle = "#3dd5ff";
+          ctx.font = "500 22px 'Noto Sans SC', sans-serif";
+          ctx.fillText(`📍 ${t.place}`, pad, cy);
+          cy += 18;
+
+          if (photoImgs[t.id]) {
+            cy += 8;
+            drawCover(ctx, photoImgs[t.id], pad, cy, contentW, 260, 14);
+            cy += 274;
+          } else {
+            cy += 8;
+            ctx.fillStyle = "rgba(232,238,245,0.55)";
+            ctx.font = "400 22px 'Noto Sans SC', sans-serif";
+            ctx.fillText("（本关暂无打卡照片）", pad, cy + 20);
+            cy += 40;
+          }
+
+          const story = REPORT_COPY[t.id] || t.short;
+          ctx.fillStyle = "rgba(232,238,245,0.85)";
+          ctx.font = "400 24px 'Noto Sans SC', sans-serif";
+          for (const line of wrapText(ctx, story, contentW)) {
+            ctx.fillText(line, pad, cy + 20);
+            cy += 30;
+          }
+
+          if (state.notes[t.id]) {
+            cy += 6;
+            ctx.fillStyle = "#f0c14b";
+            ctx.font = "italic 22px 'Noto Sans SC', sans-serif";
+            for (const line of wrapText(ctx, `特工手记：${state.notes[t.id]}`, contentW)) {
+              ctx.fillText(line, pad, cy + 18);
+              cy += 28;
+            }
+          }
+
+          cy += 12;
+          ctx.strokeStyle = "rgba(61,213,255,0.2)";
+          ctx.beginPath();
+          ctx.moveTo(pad, cy);
+          ctx.lineTo(pad + contentW, cy);
+          ctx.stroke();
+          cy += 22;
+        }
+
+        // footer
+        ctx.fillStyle = "rgba(240,193,75,0.15)";
+        ctx.strokeStyle = "rgba(240,193,75,0.4)";
+        roundRect(ctx, pad, cy, contentW, 100, 12);
+        ctx.fill();
+        ctx.stroke();
+        ctx.fillStyle = "#f0c14b";
+        ctx.font = "400 34px 'Ma Shan Zheng', 'Noto Sans SC', cursive";
+        ctx.textAlign = "center";
+        ctx.fillText("🏅 古城时空小特工", W / 2, cy + 40);
+        ctx.fillStyle = "rgba(232,238,245,0.8)";
+        ctx.font = "400 22px 'Noto Sans SC', sans-serif";
+        ctx.fillText("把这份报告讲给爸爸妈妈听，兑换一份神秘奖励吧！", W / 2, cy + 70);
+        ctx.fillText("—— 平遥古城时空特工系统", W / 2, cy + 94);
+        ctx.textAlign = "left";
+
+        const a = document.createElement("a");
+        const safeName = (state.nickname || "时空小特工").replace(/[\\/:*?"<>|]/g, "_");
+        a.download = `平遥特工报告_${safeName}.png`;
+        a.href = canvas.toDataURL("image/png");
+        a.click();
+
+        if (status) {
+          status.textContent = "已保存图片，请到相册 / 下载文件夹查看～";
+          setTimeout(() => status.classList.remove("show"), 2800);
+        }
+        playBeep(880, 0.08);
+      } catch (err) {
+        console.error(err);
+        alert("保存图片失败，请再试一次～");
+        if (status) status.classList.remove("show");
+      } finally {
+        if (btn) {
+          btn.disabled = false;
+          btn.textContent = "🖼️ 保存为图片";
+        }
+      }
+    }
+
+    /* Audio */
+    let audioCtx;
+    function playBeep(freq, dur) {
+      try {
+        audioCtx = audioCtx || new (window.AudioContext || window.webkitAudioContext)();
+        const o = audioCtx.createOscillator();
+        const g = audioCtx.createGain();
+        o.type = "sine";
+        o.frequency.value = freq;
+        g.gain.value = 0.05;
+        o.connect(g);
+        g.connect(audioCtx.destination);
+        o.start();
+        g.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + dur);
+        o.stop(audioCtx.currentTime + dur);
+      } catch (_) {}
+    }
+
+    function burstConfetti(n = 28) {
+      const box = document.getElementById("confetti");
+      const colors = ["#2ecfff", "#e8b84a", "#c62828", "#3dd68c", "#ff8a65", "#fff"];
+      for (let i = 0; i < n; i++) {
+        const el = document.createElement("i");
+        el.style.left = `${Math.random() * 100}%`;
+        el.style.background = colors[i % colors.length];
+        el.style.animationDuration = `${1.4 + Math.random() * 1.6}s`;
+        el.style.transform = `rotate(${Math.random() * 360}deg)`;
+        box.appendChild(el);
+        setTimeout(() => el.remove(), 3200);
+      }
+    }
+
+    /* Overlay helpers */
+    function openOverlay(id) {
+      document.getElementById(id).classList.add("open");
+      document.body.style.overflow = "hidden";
+    }
+
+    function closeOverlay(id) {
+      document.getElementById(id).classList.remove("open");
+      if (![...document.querySelectorAll(".overlay.open")].length) {
+        document.body.style.overflow = "";
+      }
+    }
+
+    document.querySelectorAll("[data-close]").forEach((el) => {
+      el.addEventListener("click", () => closeOverlay(el.getAttribute("data-close")));
+    });
+
+    document.querySelectorAll(".overlay").forEach((ov) => {
+      ov.addEventListener("click", (e) => {
+        if (e.target !== ov) return;
+        if (ov.id === "welcomeOverlay" && !(state.welcomed && state.nickname && state.avatar)) return;
+        closeOverlay(ov.id);
+      });
+    });
+
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape") {
+        document.querySelectorAll(".overlay.open").forEach((ov) => {
+          if (ov.id === "welcomeOverlay" && !(state.welcomed && state.nickname && state.avatar)) return;
+          closeOverlay(ov.id);
+        });
+      }
+    });
+
+    document.getElementById("taskOverlay").addEventListener("click", (e) => {
+      const t = e.target.closest("[data-close]");
+      if (t) closeOverlay(t.getAttribute("data-close"));
+    });
+
+    document.getElementById("reportOverlay").addEventListener("click", (e) => {
+      const t = e.target.closest("[data-close]");
+      if (t) closeOverlay(t.getAttribute("data-close"));
+    });
+
+    document.getElementById("reportBtn").addEventListener("click", () => openReport());
+
+    async function applyWelcomeAvatar(file) {
+      if (!file || !file.type.startsWith("image/")) {
+        const err = document.getElementById("profileError");
+        err.textContent = "请选择一张图片哦～";
+        err.classList.add("show");
+        return;
+      }
+      try {
+        pendingAvatar = await compressImage(file, 320, 0.8);
+        const preview = document.getElementById("welcomeAvatarPreview");
+        const pick = document.getElementById("avatarPick");
+        preview.src = pendingAvatar;
+        pick.classList.add("has-img");
+        document.getElementById("profileError").classList.remove("show");
+      } catch (_) {
+        const err = document.getElementById("profileError");
+        err.textContent = "头像上传失败，换一张试试～";
+        err.classList.add("show");
+      }
+    }
+
+    document.getElementById("welcomeAvatarCamera").addEventListener("change", async (e) => {
+      const file = e.target.files?.[0];
+      if (file) await applyWelcomeAvatar(file);
+      e.target.value = "";
+    });
+
+    document.getElementById("welcomeAvatarAlbum").addEventListener("change", async (e) => {
+      const file = e.target.files?.[0];
+      if (file) await applyWelcomeAvatar(file);
+      e.target.value = "";
+    });
+
+    document.getElementById("startBtn").addEventListener("click", () => {
+      const nick = (document.getElementById("nickInput").value || "").trim();
+      const err = document.getElementById("profileError");
+      if (!pendingAvatar && !state.avatar) {
+        err.textContent = "请先上传一张头像～";
+        err.classList.add("show");
+        return;
+      }
+      if (nick.length < 1) {
+        err.textContent = "请填写特工昵称～";
+        err.classList.add("show");
+        return;
+      }
+      state.nickname = nick.slice(0, 12);
+      state.avatar = pendingAvatar || state.avatar;
+      state.welcomed = true;
+      saveState();
+      updateAgentBar();
+      closeOverlay("welcomeOverlay");
+      playBeep(740, 0.1);
+    });
+
+    document.getElementById("resetBtn").addEventListener("click", () => {
+      if (!confirm("确定要清空所有任务进度、打卡照片和特工资料吗？")) return;
+      state = { done: {}, notes: {}, challengeOk: {}, photos: {}, nickname: "", avatar: "", welcomed: false };
+      session = {};
+      pendingAvatar = "";
+      saveState();
+      renderGrid();
+      updateProgress();
+      document.getElementById("nickInput").value = "";
+      document.getElementById("avatarPick").classList.remove("has-img");
+      document.getElementById("welcomeAvatarPreview").removeAttribute("src");
+      openOverlay("welcomeOverlay");
+    });
+
+    /* Init */
+    renderGrid();
+    updateProgress();
+    if (state.welcomed && state.nickname && state.avatar) {
+      closeOverlay("welcomeOverlay");
+      updateAgentBar();
+    } else {
+      state.welcomed = false;
+      if (state.nickname) document.getElementById("nickInput").value = state.nickname;
+      if (state.avatar) {
+        pendingAvatar = state.avatar;
+        document.getElementById("welcomeAvatarPreview").src = state.avatar;
+        document.getElementById("avatarPick").classList.add("has-img");
+      }
+      openOverlay("welcomeOverlay");
+    }
+  </script>
+</body>
+</html>
