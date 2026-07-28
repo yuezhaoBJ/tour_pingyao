@@ -300,7 +300,7 @@
     .task-card:nth-child(7) { animation-delay: 0.35s; }
 
     @keyframes card-in {
-      from { opacity: 0; transform: translateY(16px) scale(0.96); }
+      from { opacity: 0.2; transform: translateY(12px) scale(0.98); }
       to { opacity: 1; transform: none; }
     }
 
@@ -369,20 +369,42 @@
       overflow: hidden;
       border: 1px solid rgba(61, 213, 255, 0.35);
       box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.35);
-      background: #0a121c center / cover no-repeat;
+      background-color: #0a121c;
+      background-position: center;
+      background-size: cover;
+      background-repeat: no-repeat;
+      -webkit-transform: translateZ(0);
+      transform: translateZ(0);
     }
 
     .card-art img.art-cover {
+      position: absolute;
+      inset: 0;
       width: 100%;
       height: 100%;
       object-fit: cover;
       display: block;
+      z-index: 0;
+      border: 0;
+      pointer-events: none;
+      -webkit-user-select: none;
+      user-select: none;
+    }
+
+    .card-art .art-emoji {
+      position: absolute;
+      inset: 0;
+      display: grid;
+      place-items: center;
+      font-size: 2rem;
+      z-index: 0;
     }
 
     .card-art::after {
       content: "";
       position: absolute;
       inset: 0;
+      z-index: 1;
       background: linear-gradient(180deg, transparent 45%, rgba(0, 0, 0, 0.35));
       pointer-events: none;
     }
@@ -1238,6 +1260,62 @@
 
     .avatar-actions input[type="file"] { display: none; }
 
+    .avatar-actions button.btn-photo {
+      font: inherit;
+      font-size: 0.82rem;
+      font-weight: 700;
+      padding: 0.55rem 0.85rem;
+      border-radius: 10px;
+      cursor: pointer;
+      border: 1px solid transparent;
+      background: linear-gradient(135deg, #3dd5ff, #1a9bb8);
+      color: #041018;
+      box-shadow: 0 4px 12px rgba(61, 213, 255, 0.3);
+    }
+
+    #avatarPick { cursor: pointer; }
+
+    .cam-stage {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 3 / 4;
+      max-height: min(52vh, 420px);
+      border-radius: 14px;
+      overflow: hidden;
+      background: #000;
+      border: 1px solid rgba(61, 213, 255, 0.3);
+    }
+
+    .cam-stage video,
+    .cam-stage canvas {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      transform: scaleX(-1);
+    }
+
+    .cam-stage canvas { display: none; }
+    .cam-stage.shot video { display: none; }
+    .cam-stage.shot canvas { display: block; }
+
+    .cam-hint {
+      margin-top: 0.65rem;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      text-align: center;
+    }
+
+    .cam-error {
+      color: #ff8a80;
+      font-size: 0.82rem;
+      text-align: center;
+      margin-top: 0.5rem;
+      display: none;
+    }
+
+    .cam-error.show { display: block; }
+
     .nick-row {
       width: 100%;
       display: flex;
@@ -1296,8 +1374,8 @@
 
     /* Report — photo-first album */
     #reportOverlay .modal {
-      width: min(720px, 100%);
-      max-height: min(94vh, 960px);
+      width: min(860px, 100%);
+      max-height: min(94vh, 980px);
     }
 
     .report {
@@ -1412,52 +1490,64 @@
       display: none;
     }
 
+    /* 两列瀑布流 */
     .report-gallery {
-      display: flex;
-      flex-direction: column;
-      gap: 1rem;
+      column-count: 2;
+      column-gap: 0.75rem;
+      width: 100%;
+    }
+
+    @media (max-width: 520px) {
+      .report-gallery { column-count: 1; }
     }
 
     .report-entry {
-      margin: 0;
+      display: inline-block;
+      width: 100%;
+      margin: 0 0 0.75rem;
       padding: 0;
       border: none;
-      border-radius: 16px;
+      border-radius: 14px;
       overflow: hidden;
       background: rgba(8, 14, 24, 0.65);
       border: 1px solid rgba(61, 213, 255, 0.22);
       box-shadow: 0 8px 24px rgba(0, 0, 0, 0.28);
+      break-inside: avoid;
+      -webkit-column-break-inside: avoid;
+      page-break-inside: avoid;
     }
 
     .report-entry .photo-stage {
       position: relative;
       width: 100%;
       background: #0a121c;
-      min-height: 180px;
+      min-height: 120px;
     }
 
     .report-entry .photo-stage img {
       width: 100%;
-      max-height: none;
       height: auto;
-      max-height: 360px;
+      max-height: none;
       object-fit: cover;
       display: block;
       border: none;
       border-radius: 0;
       margin: 0;
+      vertical-align: top;
     }
 
-    .report-entry .photo-stage.tall img {
-      max-height: 460px;
-    }
+    /* 错落高度：奇偶卡片略不同裁切，增强瀑布感 */
+    .report-entry:nth-child(3n + 1) .photo-stage img { aspect-ratio: 3 / 4; object-fit: cover; }
+    .report-entry:nth-child(3n + 2) .photo-stage img { aspect-ratio: 4 / 3; object-fit: cover; }
+    .report-entry:nth-child(3n) .photo-stage img { aspect-ratio: 1 / 1; object-fit: cover; }
 
     .report-entry .photo-stage.empty {
       display: grid;
       place-items: center;
-      min-height: 140px;
+      min-height: 120px;
+      aspect-ratio: 4 / 3;
       color: var(--text-muted);
-      font-size: 0.85rem;
+      font-size: 0.8rem;
     }
 
     .report-entry .photo-meta {
@@ -1465,35 +1555,38 @@
       left: 0;
       right: 0;
       bottom: 0;
-      padding: 1.6rem 0.85rem 0.75rem;
-      background: linear-gradient(180deg, transparent, rgba(4, 10, 18, 0.88));
+      padding: 1.4rem 0.7rem 0.65rem;
+      background: linear-gradient(180deg, transparent, rgba(4, 10, 18, 0.9));
       color: #fff;
     }
 
     .report-entry .photo-meta h4 {
-      font-size: 0.95rem;
+      font-size: 0.86rem;
       color: #fff;
-      margin: 0 0 0.2rem;
+      margin: 0 0 0.15rem;
       display: flex;
       align-items: center;
-      gap: 0.35rem;
+      gap: 0.3rem;
       text-shadow: 0 1px 8px rgba(0, 0, 0, 0.55);
     }
 
     .report-entry .place {
-      font-size: 0.72rem;
+      font-size: 0.68rem;
       color: #7ae7ff;
       margin: 0;
       opacity: 0.95;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
 
     .report-entry .entry-body {
-      padding: 0.65rem 0.85rem 0.8rem;
+      padding: 0.55rem 0.7rem 0.7rem;
     }
 
     .report-entry .caption {
-      font-size: 0.8rem;
-      line-height: 1.55;
+      font-size: 0.72rem;
+      line-height: 1.5;
       color: var(--text-muted);
       display: -webkit-box;
       -webkit-line-clamp: 2;
@@ -1502,10 +1595,14 @@
     }
 
     .report-entry .note {
-      margin-top: 0.35rem;
-      font-size: 0.78rem;
+      margin-top: 0.3rem;
+      font-size: 0.72rem;
       color: var(--gold);
       font-style: italic;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
     }
 
     .report-footer {
@@ -1722,10 +1819,7 @@
             <img id="welcomeAvatarPreview" alt="头像预览" />
           </div>
           <div class="avatar-actions">
-            <label class="btn-photo primary">
-              📸 拍照设置头像
-              <input type="file" id="welcomeAvatarCamera" accept="image/*" capture="user" />
-            </label>
+            <button type="button" class="btn-photo primary" id="avatarCameraBtn">📸 拍照设置头像</button>
           </div>
           <div class="nick-row">
             <label for="nickInput">特工昵称</label>
@@ -1743,6 +1837,33 @@
         </div>
         <div class="modal-actions">
           <button type="button" class="btn-primary" id="startBtn" style="flex:1">接受任务，出发！</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Avatar camera (live capture only) -->
+  <div class="overlay" id="avatarCamOverlay" role="dialog" aria-modal="true" aria-labelledby="avatarCamTitle">
+    <div class="modal">
+      <div class="modal-head">
+        <div class="modal-icon">📸</div>
+        <div>
+          <h2 id="avatarCamTitle">拍摄特工头像</h2>
+          <div class="sub">仅支持现场拍照，不能从相册选择</div>
+        </div>
+        <button type="button" class="modal-close" id="avatarCamClose" aria-label="关闭">×</button>
+      </div>
+      <div class="modal-body">
+        <div class="cam-stage" id="avatarCamStage">
+          <video id="avatarCamVideo" playsinline autoplay muted></video>
+          <canvas id="avatarCamCanvas"></canvas>
+        </div>
+        <p class="cam-hint" id="avatarCamHint">请对准自己，点击下方快门拍照</p>
+        <p class="cam-error" id="avatarCamError">无法打开摄像头，请允许相机权限后重试</p>
+        <div class="modal-actions">
+          <button type="button" class="btn-ghost" id="avatarCamRetake" style="display:none">重拍</button>
+          <button type="button" class="btn-primary" id="avatarCamShot" style="margin-left:auto">📷 拍照</button>
+          <button type="button" class="btn-primary" id="avatarCamUse" style="display:none;margin-left:auto">✓ 使用这张</button>
         </div>
       </div>
     </div>
@@ -2813,14 +2934,29 @@
       }
     }
 
+    function assetUrl(path) {
+      if (!path) return "";
+      if (/^(data:|blob:|https?:|file:)/i.test(path)) return path;
+      try {
+        return new URL(path, window.location.href).href;
+      } catch (_) {
+        return path;
+      }
+    }
+
+    function cssBgUrl(url) {
+      return String(url).replace(/\\/g, "\\\\").replace(/'/g, "%27").replace(/\)/g, "%29");
+    }
+
     function renderGrid() {
       const grid = document.getElementById("taskGrid");
       grid.innerHTML = TASKS.map((t) => {
         const done = !!state.done[t.id];
         const photo = state.photos[t.id];
-        const artStyle = photo ? ` style="background-image:url('${photo}')"` : "";
+        const cover = t.cover ? assetUrl(t.cover) : "";
+        const thumb = photo || cover;
+        const artStyle = thumb ? ` style="background-image:url('${cssBgUrl(thumb)}')"` : "";
         const artClass = photo ? "card-art has-photo" : "card-art";
-        const cover = t.cover || "";
         return `
           <button type="button" class="task-card${done ? " done" : ""}" data-id="${t.id}" aria-label="${t.title}${done ? "（已完成）" : ""}">
             <div class="card-top">
@@ -2831,7 +2967,8 @@
               </div>
             </div>
             <div class="${artClass}"${artStyle} aria-hidden="true">
-              ${cover ? `<img class="art-cover" src="${cover}" alt="" loading="lazy" />` : `<span class="art-emoji">${t.icon}</span>`}
+              ${cover && !photo ? `<img class="art-cover" src="${cover}" alt="" decoding="async" />` : ""}
+              ${!thumb ? `<span class="art-emoji">${t.icon}</span>` : ""}
               ${photo ? `<span class="card-photo-badge">已打卡</span>` : ""}
             </div>
             <p class="card-desc">${t.short}</p>
@@ -2857,7 +2994,7 @@
       const hero = document.getElementById("taskHero");
       const heroImg = document.getElementById("taskHeroImg");
       if (task.cover) {
-        heroImg.src = task.cover;
+        heroImg.src = assetUrl(task.cover);
         heroImg.alt = task.title;
         hero.classList.add("show");
       } else {
@@ -2873,10 +3010,6 @@
         <div class="info-block">
           <h3>🎯 任务内容</h3>
           <p>${task.content}</p>
-        </div>
-        <div class="info-block challenge-box">
-          <h3>⭐ 实地挑战 · 拍照打卡</h3>
-          <p>${task.challenge}</p>
         </div>
         <div class="info-block knowledge-box">
           <h3>📚 知识点</h3>
@@ -2917,11 +3050,13 @@
     function renderPhotoCheckin(task) {
       const photo = state.photos[task.id];
       const p = task.photo || { title: "打卡照", hint: "拍一张照片完成打卡吧！" };
+      const challenge = task.challenge || p.hint;
       return `
         <div class="photo-box" id="photoBox">
           <span class="step-label">STEP 3 · 拍照打卡</span>
           <h3>📷 ${escapeHtml(p.title)}</h3>
-          <p class="hint">${escapeHtml(p.hint)}</p>
+          <p class="hint"><strong>⭐ 实地挑战：</strong>${escapeHtml(challenge)}</p>
+          <p class="hint" style="margin-top:0.25rem;opacity:0.9">${escapeHtml(p.hint)}</p>
           <div class="photo-actions">
             <label class="btn-photo primary">
               📸 现场拍照
@@ -3465,15 +3600,14 @@
       const name = state.nickname || "时空小特工";
       const avatar = state.avatar || "";
       const shots = photoCount();
-      const entries = TASKS.map((t, i) => {
+      const entries = TASKS.map((t) => {
         const photo = state.photos[t.id];
         const note = state.notes[t.id];
         const story = REPORT_COPY[t.id] || t.short;
         const shortTitle = t.title.replace(/^任务[一二三四五六七八]：/, "");
-        const tall = i % 3 === 0;
         return `
           <article class="report-entry">
-            <div class="photo-stage${photo ? "" : " empty"}${tall ? " tall" : ""}">
+            <div class="photo-stage${photo ? "" : " empty"}">
               ${photo
                 ? `<img src="${photo}" alt="${escapeHtml(t.photo.title)}" loading="lazy" />`
                 : `<span>📷 本关暂无打卡照片</span>`}
@@ -3483,8 +3617,9 @@
               </div>
             </div>
             <div class="entry-body">
-              <p class="caption">${escapeHtml(story)}</p>
-              ${note ? `<p class="note">特工手记：${escapeHtml(note)}</p>` : ""}
+              ${note
+                ? `<p class="note">特工手记：${escapeHtml(note)}</p>`
+                : `<p class="caption">${escapeHtml(story)}</p>`}
             </div>
           </article>`;
       }).join("");
@@ -3596,10 +3731,13 @@
 
       try {
         const name = state.nickname || "时空小特工";
-        const W = 780;
-        const pad = 32;
+        const W = 900;
+        const pad = 28;
+        const gap = 14;
         const contentW = W - pad * 2;
+        const colW = (contentW - gap) / 2;
         const avatarR = 78;
+        const ratios = [3 / 4, 4 / 3, 1, 5 / 6, 4 / 5, 3 / 4, 1];
 
         const avatarImg = await loadImage(state.avatar);
         const photoImgs = {};
@@ -3608,38 +3746,37 @@
         }
 
         const measure = document.createElement("canvas").getContext("2d");
-        let y = pad + 8;
 
-        // hero: avatar + name + chips
-        y += avatarR * 2 + 28;
-        y += 48; // name
-        y += 36; // chips
-        y += 28; // date
-        y += 24;
-
-        for (let i = 0; i < TASKS.length; i++) {
-          const t = TASKS[i];
+        const cards = TASKS.map((t, i) => {
           const img = photoImgs[t.id];
-          const photoH = img
-            ? Math.min(i % 3 === 0 ? 460 : 340, Math.round(contentW * (img.height / img.width)))
-            : 100;
-          // clamp photo height to flexible range
-          const h = img ? Math.max(240, Math.min(i % 3 === 0 ? 480 : 360, photoH || 320)) : 100;
-          y += h + 12; // photo with overlay title inside
-          measure.font = "400 22px 'Noto Sans SC', sans-serif";
+          const shortTitle = t.title.replace(/^任务[一二三四五六七八]：/, "");
           const story = REPORT_COPY[t.id] || t.short;
-          const storyLines = wrapText(measure, story, contentW - 24).slice(0, 2);
-          y += 16 + storyLines.length * 28;
-          if (state.notes[t.id]) {
-            measure.font = "italic 20px 'Noto Sans SC', sans-serif";
-            y += wrapText(measure, `特工手记：${state.notes[t.id]}`, contentW - 24).slice(0, 2).length * 26 + 6;
-          }
-          y += 22;
-        }
-        y += 110; // footer
-        y += pad;
+          const note = state.notes[t.id] || "";
+          const ratio = ratios[i % ratios.length];
+          const photoH = img ? Math.round(colW * ratio) : 120;
+          measure.font = "italic 18px 'Noto Sans SC', sans-serif";
+          const bodyText = note ? `特工手记：${note}` : story;
+          const bodyLines = wrapText(measure, bodyText, colW - 22).slice(0, 2);
+          const bodyH = 12 + bodyLines.length * 24 + 12;
+          return {
+            t, img, shortTitle, note, story, bodyText, bodyLines,
+            photoH, cardH: photoH + bodyH, i,
+          };
+        });
 
-        const H = Math.ceil(y);
+        const colH = [0, 0];
+        for (const card of cards) {
+          const side = colH[0] <= colH[1] ? 0 : 1;
+          card.x = pad + side * (colW + gap);
+          card.y = colH[side];
+          colH[side] += card.cardH + gap;
+        }
+        const galleryH = Math.max(colH[0], colH[1], 0);
+
+        let heroH = pad + 16 + avatarR * 2 + 26 + 48 + 42 + 28 + 20;
+        const footerH = 100;
+        const H = Math.ceil(heroH + galleryH + footerH + pad);
+
         const canvas = document.createElement("canvas");
         const scale = 2;
         canvas.width = W * scale;
@@ -3662,7 +3799,6 @@
         let cy = pad + 16;
         const cx = W / 2;
 
-        // avatar glow
         const glow = ctx.createRadialGradient(cx, cy + avatarR, 20, cx, cy + avatarR, avatarR + 36);
         glow.addColorStop(0, "rgba(240,193,75,0.45)");
         glow.addColorStop(1, "rgba(240,193,75,0)");
@@ -3671,7 +3807,6 @@
         ctx.arc(cx, cy + avatarR, avatarR + 36, 0, Math.PI * 2);
         ctx.fill();
 
-        // avatar
         ctx.save();
         ctx.beginPath();
         ctx.arc(cx, cy + avatarR, avatarR, 0, Math.PI * 2);
@@ -3713,15 +3848,10 @@
         ctx.fillText(name, cx, cy);
         cy += 28;
 
-        // chips
         const chips = [currentLoc.role, currentLoc.name, `📷 ${photoCount()} 张`];
         ctx.font = "700 20px 'Noto Sans SC', sans-serif";
-        const chipGaps = 10;
-        const chipPads = chips.map((c) => ({
-          text: c,
-          w: ctx.measureText(c).width + 28,
-        }));
-        const chipsW = chipPads.reduce((a, c) => a + c.w, 0) + chipGaps * (chips.length - 1);
+        const chipPads = chips.map((c) => ({ text: c, w: ctx.measureText(c).width + 28 }));
+        const chipsW = chipPads.reduce((a, c) => a + c.w, 0) + 10 * (chips.length - 1);
         let chipX = cx - chipsW / 2;
         chipPads.forEach((c, i) => {
           const isGold = i === 0;
@@ -3733,7 +3863,7 @@
           ctx.stroke();
           ctx.fillStyle = isGold ? "#f0c14b" : "#7ae7ff";
           ctx.fillText(c.text, chipX + c.w / 2, cy + 21);
-          chipX += c.w + chipGaps;
+          chipX += c.w + 10;
         });
         cy += 42;
 
@@ -3741,110 +3871,85 @@
         ctx.font = "400 20px 'Noto Sans SC', sans-serif";
         ctx.fillText(`${currentLoc.reportLabel} · ${formatReportDate()}`, cx, cy);
         ctx.textAlign = "left";
-        cy += 28;
+        cy += 24;
 
-        // gallery
-        for (let i = 0; i < TASKS.length; i++) {
-          const t = TASKS[i];
-          const img = photoImgs[t.id];
-          const shortTitle = t.title.replace(/^任务[一二三四五六七八]：/, "");
-          let photoH = 280;
-          if (img) {
-            const natural = Math.round(contentW * (img.height / img.width));
-            photoH = Math.max(240, Math.min(i % 3 === 0 ? 480 : 360, natural || 320));
-          } else {
-            photoH = 110;
-          }
+        const galleryTop = cy;
 
-          // card bg
-          const story = REPORT_COPY[t.id] || t.short;
-          ctx.font = "400 22px 'Noto Sans SC', sans-serif";
-          const storyLines = wrapText(ctx, story, contentW - 28).slice(0, 2);
-          let noteLines = [];
-          if (state.notes[t.id]) {
-            ctx.font = "italic 20px 'Noto Sans SC', sans-serif";
-            noteLines = wrapText(ctx, `特工手记：${state.notes[t.id]}`, contentW - 28).slice(0, 2);
-          }
-          const bodyH = 14 + storyLines.length * 28 + (noteLines.length ? noteLines.length * 26 + 6 : 0) + 14;
-          const cardH = photoH + bodyH;
+        function drawMasonryCard(card) {
+          const x = card.x;
+          const y = galleryTop + card.y;
+          const { img, photoH, cardH, shortTitle, t, bodyLines, note } = card;
 
           ctx.fillStyle = "rgba(8,14,24,0.75)";
           ctx.strokeStyle = "rgba(61,213,255,0.28)";
           ctx.lineWidth = 1.5;
-          roundRect(ctx, pad, cy, contentW, cardH, 16);
+          roundRect(ctx, x, y, colW, cardH, 14);
           ctx.fill();
           ctx.stroke();
 
-          // photo clipped top of card
           ctx.save();
-          roundRect(ctx, pad, cy, contentW, photoH, 16);
+          roundRect(ctx, x, y, colW, photoH, 14);
           ctx.clip();
-          // square top corners effectively by also filling
           ctx.beginPath();
-          ctx.rect(pad, cy, contentW, photoH);
+          ctx.rect(x, y, colW, photoH);
           ctx.clip();
           if (img) {
-            const scale = Math.max(contentW / img.width, photoH / img.height);
-            const dw = img.width * scale;
-            const dh = img.height * scale;
-            ctx.drawImage(img, pad + (contentW - dw) / 2, cy + (photoH - dh) / 2, dw, dh);
+            const s = Math.max(colW / img.width, photoH / img.height);
+            const dw = img.width * s;
+            const dh = img.height * s;
+            ctx.drawImage(img, x + (colW - dw) / 2, y + (photoH - dh) / 2, dw, dh);
           } else {
             ctx.fillStyle = "#0a121c";
-            ctx.fillRect(pad, cy, contentW, photoH);
+            ctx.fillRect(x, y, colW, photoH);
             ctx.fillStyle = "rgba(232,238,245,0.55)";
-            ctx.font = "400 22px 'Noto Sans SC', sans-serif";
+            ctx.font = "400 18px 'Noto Sans SC', sans-serif";
             ctx.textAlign = "center";
-            ctx.fillText("📷 本关暂无打卡照片", cx, cy + photoH / 2);
+            ctx.fillText("📷 暂无照片", x + colW / 2, y + photoH / 2);
             ctx.textAlign = "left";
           }
-          // gradient overlay
-          const g = ctx.createLinearGradient(0, cy + photoH - 90, 0, cy + photoH);
+          const g = ctx.createLinearGradient(0, y + photoH - 72, 0, y + photoH);
           g.addColorStop(0, "rgba(4,10,18,0)");
-          g.addColorStop(1, "rgba(4,10,18,0.88)");
+          g.addColorStop(1, "rgba(4,10,18,0.9)");
           ctx.fillStyle = g;
-          ctx.fillRect(pad, cy + photoH - 90, contentW, 90);
+          ctx.fillRect(x, y + photoH - 72, colW, 72);
           ctx.fillStyle = "#fff";
-          ctx.font = "700 26px 'Noto Sans SC', sans-serif";
-          ctx.fillText(`${t.icon} ${shortTitle}`, pad + 16, cy + photoH - 36);
+          ctx.font = "700 20px 'Noto Sans SC', sans-serif";
+          ctx.fillText(`${t.icon} ${shortTitle}`, x + 12, y + photoH - 30);
           ctx.fillStyle = "#7ae7ff";
-          ctx.font = "500 18px 'Noto Sans SC', sans-serif";
-          ctx.fillText(`📍 ${t.place}`, pad + 16, cy + photoH - 12);
+          ctx.font = "500 15px 'Noto Sans SC', sans-serif";
+          const place = `📍 ${t.place}`;
+          const placeClip = place.length > 16 ? `${place.slice(0, 15)}…` : place;
+          ctx.fillText(placeClip, x + 12, y + photoH - 10);
           ctx.restore();
 
-          let ty = cy + photoH + 22;
-          ctx.fillStyle = "rgba(232,238,245,0.78)";
-          ctx.font = "400 22px 'Noto Sans SC', sans-serif";
-          for (const line of storyLines) {
-            ctx.fillText(line, pad + 14, ty);
-            ty += 28;
+          let ty = y + photoH + 20;
+          ctx.fillStyle = note ? "#f0c14b" : "rgba(232,238,245,0.75)";
+          ctx.font = note
+            ? "italic 17px 'Noto Sans SC', sans-serif"
+            : "400 17px 'Noto Sans SC', sans-serif";
+          for (const line of bodyLines) {
+            ctx.fillText(line, x + 11, ty);
+            ty += 24;
           }
-          if (noteLines.length) {
-            ty += 4;
-            ctx.fillStyle = "#f0c14b";
-            ctx.font = "italic 20px 'Noto Sans SC', sans-serif";
-            for (const line of noteLines) {
-              ctx.fillText(line, pad + 14, ty);
-              ty += 26;
-            }
-          }
-
-          cy += cardH + 18;
         }
 
-        // footer
+        for (const card of cards) drawMasonryCard(card);
+
+        cy = galleryTop + galleryH + 8;
+
         ctx.fillStyle = "rgba(240,193,75,0.14)";
         ctx.strokeStyle = "rgba(240,193,75,0.4)";
-        roundRect(ctx, pad, cy, contentW, 96, 14);
+        roundRect(ctx, pad, cy, contentW, 88, 14);
         ctx.fill();
         ctx.stroke();
         ctx.textAlign = "center";
         ctx.fillStyle = "#f0c14b";
-        ctx.font = "400 34px 'Ma Shan Zheng', 'Noto Sans SC', cursive";
-        ctx.fillText(currentLoc.rewardTitle, cx, cy + 38);
+        ctx.font = "400 32px 'Ma Shan Zheng', 'Noto Sans SC', cursive";
+        ctx.fillText(currentLoc.rewardTitle, cx, cy + 34);
         ctx.fillStyle = "rgba(232,238,245,0.8)";
-        ctx.font = "400 20px 'Noto Sans SC', sans-serif";
-        ctx.fillText("以镜头记录旅途，把这份相册讲给爸爸妈妈听吧！", cx, cy + 66);
-        ctx.fillText(`—— ${currentLoc.name}时空特工系统`, cx, cy + 88);
+        ctx.font = "400 18px 'Noto Sans SC', sans-serif";
+        ctx.fillText("以镜头记录旅途，把这份相册讲给爸爸妈妈听吧！", cx, cy + 58);
+        ctx.fillText(`—— ${currentLoc.name}时空特工系统`, cx, cy + 78);
         ctx.textAlign = "left";
 
         const a = document.createElement("a");
@@ -3929,8 +4034,13 @@
 
     document.addEventListener("keydown", (e) => {
       if (e.key === "Escape") {
+        if (document.getElementById("avatarCamOverlay")?.classList.contains("open")) {
+          closeAvatarCamera();
+          return;
+        }
         document.querySelectorAll(".overlay.open").forEach((ov) => {
           if (ov.id === "welcomeOverlay" && !(state.welcomed && state.nickname && state.avatar)) return;
+          if (ov.id === "avatarCamOverlay") return;
           closeOverlay(ov.id);
         });
       }
@@ -3948,31 +4058,126 @@
 
     document.getElementById("reportBtn").addEventListener("click", () => openReport());
 
-    async function applyWelcomeAvatar(file) {
-      if (!file || !file.type.startsWith("image/")) {
-        const err = document.getElementById("profileError");
-        err.textContent = "请选择一张图片哦～";
-        err.classList.add("show");
+    let avatarStream = null;
+    let avatarShotDataUrl = "";
+
+    function stopAvatarCamera() {
+      if (avatarStream) {
+        avatarStream.getTracks().forEach((t) => t.stop());
+        avatarStream = null;
+      }
+      const video = document.getElementById("avatarCamVideo");
+      if (video) video.srcObject = null;
+    }
+
+    function resetAvatarCamUi() {
+      avatarShotDataUrl = "";
+      const stage = document.getElementById("avatarCamStage");
+      stage?.classList.remove("shot");
+      document.getElementById("avatarCamShot").style.display = "";
+      document.getElementById("avatarCamUse").style.display = "none";
+      document.getElementById("avatarCamRetake").style.display = "none";
+      document.getElementById("avatarCamHint").textContent = "请对准自己，点击下方快门拍照";
+      document.getElementById("avatarCamError").classList.remove("show");
+    }
+
+    async function openAvatarCamera() {
+      resetAvatarCamUi();
+      const errEl = document.getElementById("avatarCamError");
+      if (!navigator.mediaDevices?.getUserMedia) {
+        errEl.textContent = "当前环境不支持摄像头，请用手机浏览器打开本页后再试";
+        errEl.classList.add("show");
+        openOverlay("avatarCamOverlay");
         return;
       }
+      openOverlay("avatarCamOverlay");
       try {
-        pendingAvatar = await compressImage(file, 320, 0.8);
-        const preview = document.getElementById("welcomeAvatarPreview");
-        const pick = document.getElementById("avatarPick");
-        preview.src = pendingAvatar;
-        pick.classList.add("has-img");
-        document.getElementById("profileError").classList.remove("show");
+        stopAvatarCamera();
+        avatarStream = await navigator.mediaDevices.getUserMedia({
+          audio: false,
+          video: {
+            facingMode: { ideal: "user" },
+            width: { ideal: 720 },
+            height: { ideal: 960 },
+          },
+        });
+        const video = document.getElementById("avatarCamVideo");
+        video.srcObject = avatarStream;
+        await video.play();
+        errEl.classList.remove("show");
       } catch (_) {
-        const err = document.getElementById("profileError");
-        err.textContent = "头像拍照失败，再试一次～";
-        err.classList.add("show");
+        errEl.textContent = "无法打开摄像头，请允许相机权限后重试（需用手机或电脑摄像头）";
+        errEl.classList.add("show");
       }
     }
 
-    document.getElementById("welcomeAvatarCamera").addEventListener("change", async (e) => {
-      const file = e.target.files?.[0];
-      if (file) await applyWelcomeAvatar(file);
-      e.target.value = "";
+    function closeAvatarCamera() {
+      stopAvatarCamera();
+      resetAvatarCamUi();
+      closeOverlay("avatarCamOverlay");
+    }
+
+    function applyWelcomeAvatarDataUrl(dataUrl) {
+      pendingAvatar = dataUrl;
+      const preview = document.getElementById("welcomeAvatarPreview");
+      const pick = document.getElementById("avatarPick");
+      preview.src = dataUrl;
+      pick.classList.add("has-img");
+      document.getElementById("profileError").classList.remove("show");
+    }
+
+    document.getElementById("avatarCameraBtn").addEventListener("click", () => openAvatarCamera());
+    document.getElementById("avatarPick").addEventListener("click", () => openAvatarCamera());
+    document.getElementById("avatarCamClose").addEventListener("click", () => closeAvatarCamera());
+
+    document.getElementById("avatarCamOverlay").addEventListener("click", (e) => {
+      if (e.target.id === "avatarCamOverlay") closeAvatarCamera();
+    });
+
+    document.getElementById("avatarCamShot").addEventListener("click", () => {
+      const video = document.getElementById("avatarCamVideo");
+      const canvas = document.getElementById("avatarCamCanvas");
+      if (!video.videoWidth) {
+        const errEl = document.getElementById("avatarCamError");
+        errEl.textContent = "摄像头还没准备好，稍等一下再拍～";
+        errEl.classList.add("show");
+        return;
+      }
+      const side = Math.min(video.videoWidth, video.videoHeight);
+      const sx = (video.videoWidth - side) / 2;
+      const sy = (video.videoHeight - side) / 2;
+      const out = 320;
+      canvas.width = out;
+      canvas.height = out;
+      const ctx = canvas.getContext("2d");
+      // mirror to match preview
+      ctx.translate(out, 0);
+      ctx.scale(-1, 1);
+      ctx.drawImage(video, sx, sy, side, side, 0, 0, out, out);
+      avatarShotDataUrl = canvas.toDataURL("image/jpeg", 0.82);
+      document.getElementById("avatarCamStage").classList.add("shot");
+      document.getElementById("avatarCamShot").style.display = "none";
+      document.getElementById("avatarCamUse").style.display = "";
+      document.getElementById("avatarCamRetake").style.display = "";
+      document.getElementById("avatarCamHint").textContent = "满意就点「使用这张」，不满意可重拍";
+      document.getElementById("avatarCamError").classList.remove("show");
+      playBeep(988, 0.06);
+    });
+
+    document.getElementById("avatarCamRetake").addEventListener("click", () => {
+      avatarShotDataUrl = "";
+      document.getElementById("avatarCamStage").classList.remove("shot");
+      document.getElementById("avatarCamShot").style.display = "";
+      document.getElementById("avatarCamUse").style.display = "none";
+      document.getElementById("avatarCamRetake").style.display = "none";
+      document.getElementById("avatarCamHint").textContent = "请对准自己，点击下方快门拍照";
+    });
+
+    document.getElementById("avatarCamUse").addEventListener("click", () => {
+      if (!avatarShotDataUrl) return;
+      applyWelcomeAvatarDataUrl(avatarShotDataUrl);
+      closeAvatarCamera();
+      playBeep(740, 0.08);
     });
 
     document.getElementById("startBtn").addEventListener("click", () => {
@@ -4019,7 +4224,7 @@
 
     // 离开页面 / 切到后台时再落盘一次，防止漏存
     const flushSave = () => { try { saveState(); } catch (_) {} };
-    window.addEventListener("pagehide", flushSave);
+    window.addEventListener("pagehide", () => { stopAvatarCamera(); flushSave(); });
     document.addEventListener("visibilitychange", () => {
       if (document.visibilityState === "hidden") flushSave();
       else updateSavePill(!!state.savedAt, state.savedAt);
