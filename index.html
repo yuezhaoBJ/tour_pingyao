@@ -1576,6 +1576,28 @@
       min-height: 120px;
     }
 
+    .report-entry .photo-stage.has-zoom {
+      cursor: zoom-in;
+    }
+
+    .report-entry .photo-stage.has-zoom::after {
+      content: "🔍";
+      position: absolute;
+      top: 0.5rem;
+      left: 0.5rem;
+      z-index: 2;
+      width: 1.7rem;
+      height: 1.7rem;
+      display: grid;
+      place-items: center;
+      font-size: 0.75rem;
+      border-radius: 999px;
+      background: rgba(0, 0, 0, 0.45);
+      border: 1px solid rgba(255, 255, 255, 0.22);
+      opacity: 0.85;
+      pointer-events: none;
+    }
+
     .report-entry .photo-stage img {
       width: 100%;
       height: auto;
@@ -1586,6 +1608,91 @@
       border-radius: 0;
       margin: 0;
       vertical-align: top;
+    }
+
+    /* 相册大图查看 */
+    #photoViewOverlay {
+      z-index: 1200;
+      padding: 0.75rem;
+      background: rgba(2, 6, 12, 0.92);
+    }
+
+    #photoViewOverlay .photo-view-frame {
+      position: relative;
+      width: min(920px, 100%);
+      max-height: min(92vh, 980px);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.75rem;
+      transform: translateY(14px) scale(0.97);
+      transition: transform 0.28s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    #photoViewOverlay.open .photo-view-frame {
+      transform: none;
+    }
+
+    #photoViewOverlay .photo-view-close {
+      position: absolute;
+      top: -0.15rem;
+      right: -0.15rem;
+      z-index: 2;
+      width: 2.4rem;
+      height: 2.4rem;
+      border: 1px solid rgba(61, 213, 255, 0.45);
+      border-radius: 999px;
+      background: rgba(10, 18, 28, 0.88);
+      color: #dff8ff;
+      font-size: 1.4rem;
+      line-height: 1;
+      cursor: pointer;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
+    }
+
+    #photoViewOverlay .photo-view-close:hover {
+      background: rgba(61, 213, 255, 0.22);
+    }
+
+    #photoViewOverlay .photo-view-img-wrap {
+      width: 100%;
+      max-height: min(78vh, 820px);
+      display: grid;
+      place-items: center;
+      overflow: hidden;
+      border-radius: 14px;
+      border: 1px solid rgba(61, 213, 255, 0.35);
+      background: #050a12;
+      box-shadow: 0 0 36px rgba(61, 213, 255, 0.18), 0 18px 48px rgba(0, 0, 0, 0.55);
+    }
+
+    #photoViewOverlay .photo-view-img-wrap img {
+      display: block;
+      width: auto;
+      height: auto;
+      max-width: 100%;
+      max-height: min(78vh, 820px);
+      object-fit: contain;
+    }
+
+    #photoViewOverlay .photo-view-caption {
+      width: 100%;
+      text-align: center;
+      color: #e8f7ff;
+      padding: 0 0.5rem 0.25rem;
+    }
+
+    #photoViewOverlay .photo-view-caption h3 {
+      margin: 0 0 0.2rem;
+      font-size: 1rem;
+      font-weight: 800;
+      letter-spacing: 0.02em;
+    }
+
+    #photoViewOverlay .photo-view-caption p {
+      margin: 0;
+      font-size: 0.82rem;
+      color: rgba(180, 230, 255, 0.88);
     }
 
     /* 错落高度：奇偶卡片略不同裁切，增强瀑布感 */
@@ -1630,6 +1737,25 @@
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
+    }
+
+    .report-entry .photo-stamp-time {
+      position: absolute;
+      top: 0.5rem;
+      right: 0.5rem;
+      z-index: 2;
+      font-size: 0.62rem;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+      color: rgba(255, 255, 255, 0.95);
+      background: rgba(0, 0, 0, 0.48);
+      border: 1px solid rgba(255, 255, 255, 0.22);
+      padding: 0.22rem 0.45rem;
+      border-radius: 6px;
+      backdrop-filter: blur(4px);
+      -webkit-backdrop-filter: blur(4px);
+      text-shadow: 0 1px 2px rgba(0, 0, 0, 0.55);
+      pointer-events: none;
     }
 
     .report-entry .entry-body {
@@ -1957,6 +2083,20 @@
     </div>
   </div>
 
+  <!-- Photo lightbox -->
+  <div class="overlay" id="photoViewOverlay" role="dialog" aria-modal="true" aria-labelledby="photoViewTitle">
+    <div class="photo-view-frame">
+      <button type="button" class="photo-view-close" id="photoViewClose" aria-label="关闭大图">×</button>
+      <div class="photo-view-img-wrap">
+        <img id="photoViewImg" alt="打卡大图" />
+      </div>
+      <div class="photo-view-caption">
+        <h3 id="photoViewTitle"></h3>
+        <p id="photoViewMeta"></p>
+      </div>
+    </div>
+  </div>
+
   <script>
     const STORAGE_KEY = "shanxi-agent-progress-v5";
     const LEGACY_KEY = "pingyao-agent-progress-v4";
@@ -1965,7 +2105,7 @@
     const CN_NUM = ["一", "二", "三", "四", "五", "六", "七", "八"];
 
     function emptyProgress() {
-      return { done: {}, notes: {}, challengeOk: {}, photos: {} };
+      return { done: {}, notes: {}, challengeOk: {}, photos: {}, photoTimes: {} };
     }
 
     const LOCATIONS = [
@@ -2636,6 +2776,7 @@
         notes: { ...state.notes },
         challengeOk: { ...state.challengeOk },
         photos: { ...state.photos },
+        photoTimes: { ...(state.photoTimes || {}) },
       };
     }
 
@@ -2645,6 +2786,7 @@
       state.notes = normalizeIdMap(src.notes);
       state.challengeOk = normalizeIdMap(src.challengeOk);
       state.photos = normalizeIdMap(src.photos);
+      state.photoTimes = normalizeIdMap(src.photoTimes);
     }
 
     /** JSON 会把数字 key 变成字符串，统一转回数字 key */
@@ -2667,6 +2809,7 @@
           notes: normalizeIdMap(s.notes),
           challengeOk: normalizeIdMap(s.challengeOk),
           photos: normalizeIdMap(s.photos),
+          photoTimes: normalizeIdMap(s.photoTimes),
         };
       });
       return out;
@@ -2696,6 +2839,7 @@
           notes: { ...(s.notes || {}) },
           challengeOk: { ...(s.challengeOk || {}) },
           photos: id === payload.locationId ? { ...(s.photos || {}) } : {},
+          photoTimes: id === payload.locationId ? { ...(s.photoTimes || {}) } : {},
         };
       });
       return { ...payload, spots: slimSpots, slimmed: true };
@@ -2758,6 +2902,7 @@
                   notes: old.notes || {},
                   challengeOk: old.challengeOk || {},
                   photos: old.photos || {},
+                  photoTimes: old.photoTimes || {},
                 },
               },
               savedAt: Date.now(),
@@ -2774,6 +2919,7 @@
               notes: parsed.notes || {},
               challengeOk: parsed.challengeOk || {},
               photos: parsed.photos || {},
+              photoTimes: parsed.photoTimes || {},
             };
           }
           spots = normalizeSpots(spots);
@@ -2789,6 +2935,7 @@
             notes: normalizeIdMap(progress.notes),
             challengeOk: normalizeIdMap(progress.challengeOk),
             photos: normalizeIdMap(progress.photos),
+            photoTimes: normalizeIdMap(progress.photoTimes),
           };
         }
       } catch (_) {}
@@ -3162,6 +3309,8 @@
         try {
           const dataUrl = await compressImage(file);
           state.photos[id] = dataUrl;
+          state.photoTimes = state.photoTimes || {};
+          state.photoTimes[id] = Date.now();
           saveState({ toast: true, message: "打卡照片已存入本机进度" });
           const wrap = document.getElementById("photoPreviewWrap");
           const img = document.getElementById("photoPreview");
@@ -3183,6 +3332,7 @@
       });
       document.getElementById("photoClear")?.addEventListener("click", () => {
         delete state.photos[id];
+        if (state.photoTimes) delete state.photoTimes[id];
         saveState();
         const wrap = document.getElementById("photoPreviewWrap");
         const img = document.getElementById("photoPreview");
@@ -3647,6 +3797,15 @@
       return `${d.getFullYear()}年${d.getMonth() + 1}月${d.getDate()}日`;
     }
 
+    function formatPhotoTime(ts) {
+      const n = Number(ts);
+      if (!n || !Number.isFinite(n)) return "";
+      const d = new Date(n);
+      if (Number.isNaN(d.getTime())) return "";
+      const pad = (v) => String(v).padStart(2, "0");
+      return `${d.getFullYear()}年${d.getMonth() + 1}月${d.getDate()}日 ${pad(d.getHours())}:${pad(d.getMinutes())}`;
+    }
+
     function openReport() {
       if (doneCount() < TASKS.length) {
         alert("先完成全部任务，才能生成报告哦！");
@@ -3660,12 +3819,16 @@
         const note = state.notes[t.id];
         const story = REPORT_COPY[t.id] || t.short;
         const shortTitle = t.title.replace(/^任务[一二三四五六七八]：/, "");
+        const stamp = photo ? formatPhotoTime(state.photoTimes && state.photoTimes[t.id]) : "";
         return `
           <article class="report-entry">
-            <div class="photo-stage${photo ? "" : " empty"}">
+            <div class="photo-stage${photo ? " has-zoom" : " empty"}"${photo
+              ? ` role="button" tabindex="0" data-view-src="1" data-task-id="${escapeHtml(t.id)}" aria-label="查看大图：${escapeHtml(shortTitle)}"`
+              : ""}>
               ${photo
                 ? `<img src="${photo}" alt="${escapeHtml(t.photo.title)}" loading="lazy" />`
                 : `<span>📷 本关暂无打卡照片</span>`}
+              ${stamp ? `<div class="photo-stamp-time">${escapeHtml(stamp)}</div>` : ""}
               <div class="photo-meta">
                 <h4>${t.icon} ${escapeHtml(shortTitle)}</h4>
                 <div class="place">📍 ${escapeHtml(t.place)}</div>
@@ -3712,6 +3875,43 @@
       `;
       openOverlay("reportOverlay");
       document.getElementById("saveReportImgBtn")?.addEventListener("click", () => saveReportAsImage());
+      bindReportPhotoView();
+    }
+
+    function openPhotoView(taskId) {
+      const t = TASKS.find((x) => x.id === taskId);
+      const src = state.photos[taskId];
+      if (!t || !src) return;
+      const shortTitle = t.title.replace(/^任务[一二三四五六七八]：/, "");
+      const stamp = formatPhotoTime(state.photoTimes && state.photoTimes[taskId]);
+      const img = document.getElementById("photoViewImg");
+      img.src = src;
+      img.alt = t.photo?.title || shortTitle;
+      document.getElementById("photoViewTitle").textContent = `${t.icon} ${shortTitle}`;
+      document.getElementById("photoViewMeta").textContent = stamp
+        ? `📍 ${t.place} · 🕒 ${stamp}`
+        : `📍 ${t.place}`;
+      openOverlay("photoViewOverlay");
+    }
+
+    function bindReportPhotoView() {
+      const body = document.getElementById("reportBody");
+      if (!body || body.dataset.photoViewBound === "1") return;
+      body.dataset.photoViewBound = "1";
+      const openFromTarget = (target) => {
+        const stage = target.closest(".photo-stage.has-zoom");
+        if (!stage) return;
+        const id = stage.getAttribute("data-task-id");
+        if (id) openPhotoView(id);
+      };
+      body.addEventListener("click", (e) => openFromTarget(e.target));
+      body.addEventListener("keydown", (e) => {
+        if (e.key !== "Enter" && e.key !== " ") return;
+        const stage = e.target.closest(".photo-stage.has-zoom");
+        if (!stage) return;
+        e.preventDefault();
+        openFromTarget(stage);
+      });
     }
 
     function loadImage(src) {
@@ -3807,6 +4007,7 @@
           const shortTitle = t.title.replace(/^任务[一二三四五六七八]：/, "");
           const story = REPORT_COPY[t.id] || t.short;
           const note = state.notes[t.id] || "";
+          const photoTime = formatPhotoTime(state.photoTimes && state.photoTimes[t.id]);
           const ratio = ratios[i % ratios.length];
           const photoH = img ? Math.round(colW * ratio) : 120;
           measure.font = "italic 18px 'Noto Sans SC', sans-serif";
@@ -3814,7 +4015,7 @@
           const bodyLines = wrapText(measure, bodyText, colW - 22).slice(0, 2);
           const bodyH = 12 + bodyLines.length * 24 + 12;
           return {
-            t, img, shortTitle, note, story, bodyText, bodyLines,
+            t, img, shortTitle, note, story, bodyText, bodyLines, photoTime,
             photoH, cardH: photoH + bodyH, i,
           };
         });
@@ -3962,6 +4163,27 @@
             ctx.fillText("📷 暂无照片", x + colW / 2, y + photoH / 2);
             ctx.textAlign = "left";
           }
+          if (img && card.photoTime) {
+            ctx.font = "700 13px 'Noto Sans SC', sans-serif";
+            const stamp = card.photoTime;
+            const tw = ctx.measureText(stamp).width;
+            const sp = 7;
+            const bx = x + colW - tw - sp * 2 - 10;
+            const by = y + 10;
+            const bw = tw + sp * 2;
+            const bh = 22;
+            ctx.fillStyle = "rgba(0,0,0,0.5)";
+            ctx.strokeStyle = "rgba(255,255,255,0.22)";
+            ctx.lineWidth = 1;
+            roundRect(ctx, bx, by, bw, bh, 6);
+            ctx.fill();
+            ctx.stroke();
+            ctx.fillStyle = "rgba(255,255,255,0.95)";
+            ctx.textAlign = "left";
+            ctx.textBaseline = "middle";
+            ctx.fillText(stamp, bx + sp, by + bh / 2 + 0.5);
+            ctx.textBaseline = "alphabetic";
+          }
           const g = ctx.createLinearGradient(0, y + photoH - 72, 0, y + photoH);
           g.addColorStop(0, "rgba(4,10,18,0)");
           g.addColorStop(1, "rgba(4,10,18,0.9)");
@@ -4070,6 +4292,9 @@
 
     function closeOverlay(id) {
       document.getElementById(id).classList.remove("open");
+      if (id === "reportOverlay") {
+        document.getElementById("photoViewOverlay")?.classList.remove("open");
+      }
       if (![...document.querySelectorAll(".overlay.open")].length) {
         document.body.style.overflow = "";
       }
@@ -4089,6 +4314,10 @@
 
     document.addEventListener("keydown", (e) => {
       if (e.key === "Escape") {
+        if (document.getElementById("photoViewOverlay")?.classList.contains("open")) {
+          closeOverlay("photoViewOverlay");
+          return;
+        }
         if (document.getElementById("avatarCamOverlay")?.classList.contains("open")) {
           closeAvatarCamera();
           return;
@@ -4109,6 +4338,10 @@
     document.getElementById("reportOverlay").addEventListener("click", (e) => {
       const t = e.target.closest("[data-close]");
       if (t) closeOverlay(t.getAttribute("data-close"));
+    });
+
+    document.getElementById("photoViewClose")?.addEventListener("click", () => {
+      closeOverlay("photoViewOverlay");
     });
 
     document.getElementById("reportBtn").addEventListener("click", () => openReport());
