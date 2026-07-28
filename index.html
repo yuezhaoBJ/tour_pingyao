@@ -1174,7 +1174,40 @@
       flex-shrink: 0;
     }
 
-    .agent-bar .agent-meta { text-align: left; min-width: 0; }
+    .agent-avatar-btn {
+      position: relative;
+      padding: 0;
+      border: none;
+      background: transparent;
+      cursor: pointer;
+      border-radius: 50%;
+      flex-shrink: 0;
+      line-height: 0;
+    }
+
+    .agent-avatar-btn img {
+      display: block;
+    }
+
+    .agent-avatar-btn::after {
+      content: "换";
+      position: absolute;
+      right: -2px;
+      bottom: -2px;
+      width: 1.1rem;
+      height: 1.1rem;
+      border-radius: 50%;
+      background: var(--cyan);
+      color: #041018;
+      font-size: 0.58rem;
+      font-weight: 900;
+      display: grid;
+      place-items: center;
+      border: 1.5px solid #0a121c;
+      line-height: 1;
+    }
+
+    .agent-bar .agent-meta { text-align: left; min-width: 0; flex: 1; }
     .agent-bar .agent-name {
       font-weight: 700;
       color: #f2f6fa;
@@ -1186,6 +1219,25 @@
     .agent-bar .agent-role {
       font-size: 0.72rem;
       color: var(--cyan);
+    }
+
+    .btn-change-avatar {
+      font: inherit;
+      font-size: 0.72rem;
+      font-weight: 700;
+      white-space: nowrap;
+      padding: 0.4rem 0.65rem;
+      border-radius: 999px;
+      cursor: pointer;
+      border: 1px solid rgba(61, 213, 255, 0.45);
+      background: rgba(61, 213, 255, 0.12);
+      color: #7ae7ff;
+      flex-shrink: 0;
+    }
+
+    .btn-change-avatar:hover {
+      background: rgba(61, 213, 255, 0.22);
+      color: #fff;
     }
 
     .profile-setup {
@@ -1765,11 +1817,14 @@
           </div>
         </div>
         <div class="agent-bar" id="agentBar">
-          <img id="agentAvatarImg" alt="特工头像" />
+          <button type="button" class="agent-avatar-btn" id="changeAvatarBtn" aria-label="更换特工照片" title="更换特工照片">
+            <img id="agentAvatarImg" alt="特工头像" />
+          </button>
           <div class="agent-meta">
             <div class="agent-name" id="agentNameText">时空小特工</div>
             <div class="agent-role" id="agentRoleText">古城时空小特工 · 任务进行中</div>
           </div>
+          <button type="button" class="btn-change-avatar" id="changeAvatarTextBtn">更换照片</button>
         </div>
       </header>
 
@@ -1849,7 +1904,7 @@
         <div class="modal-icon">📸</div>
         <div>
           <h2 id="avatarCamTitle">拍摄特工头像</h2>
-          <div class="sub">仅支持现场拍照，不能从相册选择</div>
+          <div class="sub" id="avatarCamSub">仅支持现场拍照，不能从相册选择</div>
         </div>
         <button type="button" class="modal-close" id="avatarCamClose" aria-label="关闭">×</button>
       </div>
@@ -4083,6 +4138,12 @@
 
     async function openAvatarCamera() {
       resetAvatarCamUi();
+      const changing = !!(state.welcomed && state.avatar);
+      document.getElementById("avatarCamTitle").textContent = changing ? "更换特工照片" : "拍摄特工头像";
+      document.getElementById("avatarCamSub").textContent = changing
+        ? "重新拍照替换头像 · 仅支持现场拍照"
+        : "仅支持现场拍照，不能从相册选择";
+      document.getElementById("avatarCamUse").textContent = changing ? "✓ 确认更换" : "✓ 使用这张";
       const errEl = document.getElementById("avatarCamError");
       if (!navigator.mediaDevices?.getUserMedia) {
         errEl.textContent = "当前环境不支持摄像头，请用手机浏览器打开本页后再试";
@@ -4117,17 +4178,32 @@
       closeOverlay("avatarCamOverlay");
     }
 
-    function applyWelcomeAvatarDataUrl(dataUrl) {
+    function applyAvatarDataUrl(dataUrl) {
       pendingAvatar = dataUrl;
       const preview = document.getElementById("welcomeAvatarPreview");
       const pick = document.getElementById("avatarPick");
-      preview.src = dataUrl;
-      pick.classList.add("has-img");
-      document.getElementById("profileError").classList.remove("show");
+      if (preview) preview.src = dataUrl;
+      if (pick) pick.classList.add("has-img");
+      document.getElementById("profileError")?.classList.remove("show");
+
+      // 已登记特工：立刻写入并保存
+      if (state.welcomed) {
+        state.avatar = dataUrl;
+        saveState({ toast: true, message: "特工照片已更换并保存" });
+        updateAgentBar();
+      }
     }
 
     document.getElementById("avatarCameraBtn").addEventListener("click", () => openAvatarCamera());
     document.getElementById("avatarPick").addEventListener("click", () => openAvatarCamera());
+    document.getElementById("changeAvatarBtn")?.addEventListener("click", (e) => {
+      e.stopPropagation();
+      openAvatarCamera();
+    });
+    document.getElementById("changeAvatarTextBtn")?.addEventListener("click", (e) => {
+      e.stopPropagation();
+      openAvatarCamera();
+    });
     document.getElementById("avatarCamClose").addEventListener("click", () => closeAvatarCamera());
 
     document.getElementById("avatarCamOverlay").addEventListener("click", (e) => {
@@ -4159,7 +4235,7 @@
       document.getElementById("avatarCamShot").style.display = "none";
       document.getElementById("avatarCamUse").style.display = "";
       document.getElementById("avatarCamRetake").style.display = "";
-      document.getElementById("avatarCamHint").textContent = "满意就点「使用这张」，不满意可重拍";
+      document.getElementById("avatarCamHint").textContent = "满意就点确认，不满意可重拍";
       document.getElementById("avatarCamError").classList.remove("show");
       playBeep(988, 0.06);
     });
@@ -4175,7 +4251,7 @@
 
     document.getElementById("avatarCamUse").addEventListener("click", () => {
       if (!avatarShotDataUrl) return;
-      applyWelcomeAvatarDataUrl(avatarShotDataUrl);
+      applyAvatarDataUrl(avatarShotDataUrl);
       closeAvatarCamera();
       playBeep(740, 0.08);
     });
