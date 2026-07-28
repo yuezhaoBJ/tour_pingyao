@@ -1294,10 +1294,10 @@
     .btn-report.show { display: block; }
     .btn-report:hover { filter: brightness(1.05); }
 
-    /* Report */
+    /* Report — photo-first album */
     #reportOverlay .modal {
-      width: min(640px, 100%);
-      max-height: min(92vh, 900px);
+      width: min(720px, 100%);
+      max-height: min(94vh, 960px);
     }
 
     .report {
@@ -1306,117 +1306,233 @@
 
     .report-hero {
       display: flex;
+      flex-direction: column;
       align-items: center;
-      gap: 0.85rem;
-      padding: 0.5rem 0 1rem;
-      border-bottom: 1px solid rgba(61, 213, 255, 0.2);
-      margin-bottom: 1rem;
+      text-align: center;
+      gap: 0.55rem;
+      padding: 0.35rem 0 1.1rem;
+      margin-bottom: 0.85rem;
+      position: relative;
     }
 
-    .report-hero img {
-      width: 72px;
-      height: 72px;
+    .report-hero::after {
+      content: "";
+      position: absolute;
+      left: 10%;
+      right: 10%;
+      bottom: 0;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(61, 213, 255, 0.45), transparent);
+    }
+
+    .report-avatar-wrap {
+      position: relative;
+      width: 132px;
+      height: 132px;
+      margin-bottom: 0.2rem;
+    }
+
+    .report-avatar-wrap::before {
+      content: "";
+      position: absolute;
+      inset: -8px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(240, 193, 75, 0.35), transparent 70%);
+      animation: avatar-glow 2.4s ease-in-out infinite;
+      pointer-events: none;
+    }
+
+    @keyframes avatar-glow {
+      0%, 100% { opacity: 0.55; transform: scale(0.96); }
+      50% { opacity: 1; transform: scale(1.04); }
+    }
+
+    .report-hero img.report-avatar,
+    .report-avatar-fallback {
+      width: 132px;
+      height: 132px;
       border-radius: 50%;
       object-fit: cover;
-      border: 3px solid var(--gold);
-      flex-shrink: 0;
+      border: 4px solid var(--gold);
+      box-shadow:
+        0 0 0 3px rgba(61, 213, 255, 0.35),
+        0 12px 28px rgba(0, 0, 0, 0.45);
+      position: relative;
+      z-index: 1;
+      background: #1a2838;
+    }
+
+    .report-avatar-fallback {
+      display: grid;
+      place-items: center;
+      font-size: 3rem;
+      color: #7ae7ff;
     }
 
     .report-hero h3 {
       font-family: var(--font-display);
-      font-size: 1.45rem;
+      font-size: 1.85rem;
       color: #f4f8fc;
       font-weight: 400;
-      line-height: 1.3;
+      line-height: 1.2;
+      letter-spacing: 0.02em;
+    }
+
+    .report-hero .badge-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.4rem;
+      justify-content: center;
+      margin-top: 0.15rem;
+    }
+
+    .report-hero .chip {
+      font-size: 0.72rem;
+      font-weight: 700;
+      padding: 0.28rem 0.65rem;
+      border-radius: 999px;
+      border: 1px solid rgba(61, 213, 255, 0.35);
+      background: rgba(61, 213, 255, 0.1);
+      color: #7ae7ff;
+    }
+
+    .report-hero .chip.gold {
+      border-color: rgba(240, 193, 75, 0.45);
+      background: rgba(240, 193, 75, 0.12);
+      color: var(--gold);
     }
 
     .report-hero .sub {
-      font-size: 0.8rem;
-      color: var(--cyan);
-      margin-top: 0.25rem;
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      margin-top: 0.15rem;
     }
 
     .report-summary {
-      font-size: 0.9rem;
-      line-height: 1.7;
-      color: var(--text-muted);
-      margin-bottom: 1rem;
-      padding: 0.85rem;
-      background: rgba(61, 213, 255, 0.08);
-      border-radius: 12px;
-      border: 1px solid rgba(61, 213, 255, 0.18);
+      display: none;
+    }
+
+    .report-gallery {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
     }
 
     .report-entry {
-      margin-bottom: 1.1rem;
-      padding-bottom: 1rem;
-      border-bottom: 1px dashed rgba(61, 213, 255, 0.22);
+      margin: 0;
+      padding: 0;
+      border: none;
+      border-radius: 16px;
+      overflow: hidden;
+      background: rgba(8, 14, 24, 0.65);
+      border: 1px solid rgba(61, 213, 255, 0.22);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.28);
     }
 
-    .report-entry:last-of-type { border-bottom: none; }
+    .report-entry .photo-stage {
+      position: relative;
+      width: 100%;
+      background: #0a121c;
+      min-height: 180px;
+    }
 
-    .report-entry h4 {
+    .report-entry .photo-stage img {
+      width: 100%;
+      max-height: none;
+      height: auto;
+      max-height: 360px;
+      object-fit: cover;
+      display: block;
+      border: none;
+      border-radius: 0;
+      margin: 0;
+    }
+
+    .report-entry .photo-stage.tall img {
+      max-height: 460px;
+    }
+
+    .report-entry .photo-stage.empty {
+      display: grid;
+      place-items: center;
+      min-height: 140px;
+      color: var(--text-muted);
+      font-size: 0.85rem;
+    }
+
+    .report-entry .photo-meta {
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      padding: 1.6rem 0.85rem 0.75rem;
+      background: linear-gradient(180deg, transparent, rgba(4, 10, 18, 0.88));
+      color: #fff;
+    }
+
+    .report-entry .photo-meta h4 {
       font-size: 0.95rem;
-      color: #f2f6fa;
-      margin-bottom: 0.35rem;
+      color: #fff;
+      margin: 0 0 0.2rem;
       display: flex;
       align-items: center;
       gap: 0.35rem;
+      text-shadow: 0 1px 8px rgba(0, 0, 0, 0.55);
     }
 
     .report-entry .place {
-      font-size: 0.75rem;
-      color: var(--cyan);
-      margin-bottom: 0.5rem;
+      font-size: 0.72rem;
+      color: #7ae7ff;
+      margin: 0;
+      opacity: 0.95;
     }
 
-    .report-entry img {
-      width: 100%;
-      max-height: 200px;
-      object-fit: cover;
-      border-radius: 12px;
-      margin-bottom: 0.55rem;
-      border: 1px solid rgba(61, 213, 255, 0.2);
+    .report-entry .entry-body {
+      padding: 0.65rem 0.85rem 0.8rem;
     }
 
     .report-entry .caption {
-      font-size: 0.86rem;
-      line-height: 1.65;
+      font-size: 0.8rem;
+      line-height: 1.55;
       color: var(--text-muted);
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
     }
 
     .report-entry .note {
-      margin-top: 0.4rem;
-      font-size: 0.8rem;
+      margin-top: 0.35rem;
+      font-size: 0.78rem;
       color: var(--gold);
       font-style: italic;
     }
 
     .report-footer {
       text-align: center;
-      margin-top: 0.5rem;
-      padding: 0.85rem;
-      border-radius: 12px;
-      background: linear-gradient(135deg, rgba(240, 193, 75, 0.18), rgba(198, 40, 40, 0.12));
+      margin-top: 1rem;
+      padding: 1rem 0.85rem;
+      border-radius: 14px;
+      background: linear-gradient(135deg, rgba(240, 193, 75, 0.18), rgba(61, 213, 255, 0.08));
       border: 1px solid rgba(240, 193, 75, 0.35);
-      font-size: 0.88rem;
-      line-height: 1.6;
+      font-size: 0.84rem;
+      line-height: 1.55;
       color: var(--text-muted);
     }
 
     .report-footer strong {
       display: block;
       font-family: var(--font-display);
-      font-size: 1.25rem;
+      font-size: 1.35rem;
       color: var(--gold);
-      margin-bottom: 0.25rem;
+      margin-bottom: 0.3rem;
       font-weight: 400;
     }
 
     #reportCapture {
       background: #101a28;
       color: #e8eef5;
-      padding: 0.25rem 0.15rem 0.5rem;
+      padding: 0.35rem 0.1rem 0.5rem;
       border-radius: 8px;
     }
 
@@ -1607,19 +1723,15 @@
           </div>
           <div class="avatar-actions">
             <label class="btn-photo primary">
-              📸 拍照
+              📸 拍照设置头像
               <input type="file" id="welcomeAvatarCamera" accept="image/*" capture="user" />
-            </label>
-            <label class="btn-photo">
-              🖼️ 选择文件
-              <input type="file" id="welcomeAvatarAlbum" accept="image/*" />
             </label>
           </div>
           <div class="nick-row">
             <label for="nickInput">特工昵称</label>
             <input type="text" id="nickInput" maxlength="12" placeholder="例如：小遥、勇士豆豆" autocomplete="nickname" />
           </div>
-          <p class="profile-error" id="profileError">请上传头像并填写昵称后再出发～</p>
+          <p class="profile-error" id="profileError">请拍照设置头像并填写昵称后再出发～</p>
         </div>
         <div class="info-block">
           <h3>📜 任务背景</h3>
@@ -1627,7 +1739,7 @@
         </div>
         <div class="info-block knowledge-box">
           <h3>🎮 怎么玩</h3>
-          <p>1. 设置头像与昵称<br />2. 点选上方景点切换任务清单<br />3. 热身闯关 + 知识问答 + 拍照打卡<br />4. 进度自动保存在本机，下次打开可继续<br />5. 本景点全部完成后生成图文报告</p>
+          <p>1. 拍照设置头像并填写昵称<br />2. 点选上方景点切换任务清单<br />3. 热身闯关 + 知识问答 + 现场拍照打卡<br />4. 进度自动保存在本机，下次打开可继续<br />5. 本景点全部完成后生成图文报告</p>
         </div>
         <div class="modal-actions">
           <button type="button" class="btn-primary" id="startBtn" style="flex:1">接受任务，出发！</button>
@@ -2812,14 +2924,10 @@
           <p class="hint">${escapeHtml(p.hint)}</p>
           <div class="photo-actions">
             <label class="btn-photo primary">
-              📸 拍照
+              📸 现场拍照
               <input type="file" id="photoCamera" accept="image/*" capture="environment" />
             </label>
-            <label class="btn-photo">
-              🖼️ 相册上传
-              <input type="file" id="photoAlbum" accept="image/*" />
-            </label>
-            ${photo ? `<button type="button" id="photoClear">换一张</button>` : ""}
+            ${photo ? `<button type="button" id="photoClear">重新拍照</button>` : ""}
           </div>
           <div class="photo-preview-wrap${photo ? " show" : ""}" id="photoPreviewWrap">
             ${photo ? `<img id="photoPreview" src="${photo}" alt="打卡照片" />` : `<img id="photoPreview" alt="打卡照片" />`}
@@ -2880,10 +2988,6 @@
       };
 
       document.getElementById("photoCamera")?.addEventListener("change", (e) => {
-        const file = e.target.files?.[0];
-        if (file) applyPhoto(file);
-      });
-      document.getElementById("photoAlbum")?.addEventListener("change", (e) => {
         const file = e.target.files?.[0];
         if (file) applyPhoto(file);
       });
@@ -3360,38 +3464,53 @@
       }
       const name = state.nickname || "时空小特工";
       const avatar = state.avatar || "";
-      const entries = TASKS.map((t) => {
+      const shots = photoCount();
+      const entries = TASKS.map((t, i) => {
         const photo = state.photos[t.id];
         const note = state.notes[t.id];
         const story = REPORT_COPY[t.id] || t.short;
+        const shortTitle = t.title.replace(/^任务[一二三四五六七八]：/, "");
+        const tall = i % 3 === 0;
         return `
           <article class="report-entry">
-            <h4>${t.icon} ${escapeHtml(t.title)}</h4>
-            <div class="place">📍 ${escapeHtml(t.place)}</div>
-            ${photo ? `<img src="${photo}" alt="${escapeHtml(t.photo.title)}" crossorigin="anonymous" />` : `<p class="caption">（本关暂无打卡照片）</p>`}
-            <p class="caption">${escapeHtml(story)}</p>
-            ${note ? `<p class="note">特工手记：${escapeHtml(note)}</p>` : ""}
+            <div class="photo-stage${photo ? "" : " empty"}${tall ? " tall" : ""}">
+              ${photo
+                ? `<img src="${photo}" alt="${escapeHtml(t.photo.title)}" loading="lazy" />`
+                : `<span>📷 本关暂无打卡照片</span>`}
+              <div class="photo-meta">
+                <h4>${t.icon} ${escapeHtml(shortTitle)}</h4>
+                <div class="place">📍 ${escapeHtml(t.place)}</div>
+              </div>
+            </div>
+            <div class="entry-body">
+              <p class="caption">${escapeHtml(story)}</p>
+              ${note ? `<p class="note">特工手记：${escapeHtml(note)}</p>` : ""}
+            </div>
           </article>`;
       }).join("");
 
       document.getElementById("reportBody").innerHTML = `
         <div id="reportCapture">
           <div class="report-hero">
-            ${avatar ? `<img src="${avatar}" alt="头像" />` : `<div style="width:72px;height:72px;border-radius:50%;background:#1a2838;display:grid;place-items:center;font-size:2rem;border:2px solid rgba(61,213,255,0.35)">🕵️</div>`}
-            <div>
-              <h3>${escapeHtml(name)}</h3>
-              <div class="sub">${escapeHtml(currentLoc.reportLabel)}<br />签发日期：${formatReportDate()}</div>
+            <div class="report-avatar-wrap">
+              ${avatar
+                ? `<img class="report-avatar" src="${avatar}" alt="特工头像" />`
+                : `<div class="report-avatar-fallback" aria-hidden="true">🕵️</div>`}
             </div>
+            <h3>${escapeHtml(name)}</h3>
+            <div class="badge-row">
+              <span class="chip gold">${escapeHtml(currentLoc.role)}</span>
+              <span class="chip">${escapeHtml(currentLoc.name)}</span>
+              <span class="chip">📷 ${shots} 张打卡</span>
+            </div>
+            <div class="sub">${escapeHtml(currentLoc.reportLabel)} · ${formatReportDate()}</div>
           </div>
-          <p class="report-summary">
-            兹证明特工「${escapeHtml(name)}」已圆满完成${escapeHtml(currentLoc.reportProve)}全部 ${TASKS.length} 项时空任务，累计打卡照片 ${photoCount()} 张。
-            以好奇之心探索景点奥秘，以镜头记录文化之美。
-            特授予荣誉称号——${escapeHtml(currentLoc.role)}。
-          </p>
-          ${entries}
+          <div class="report-gallery">
+            ${entries}
+          </div>
           <div class="report-footer">
             <strong>${escapeHtml(currentLoc.rewardTitle)}</strong>
-            把这份报告讲给爸爸妈妈听，兑换一份神秘奖励吧！<br />
+            以镜头记录旅途，把这份相册讲给爸爸妈妈听吧！<br />
             —— ${escapeHtml(currentLoc.name)}时空特工系统
           </div>
         </div>
@@ -3470,13 +3589,17 @@
         btn.disabled = true;
         btn.textContent = "生成中…";
       }
-      if (status) status.classList.add("show");
+      if (status) {
+        status.textContent = "正在生成图片，请稍候…";
+        status.classList.add("show");
+      }
 
       try {
         const name = state.nickname || "时空小特工";
-        const W = 750;
-        const pad = 36;
+        const W = 780;
+        const pad = 32;
         const contentW = W - pad * 2;
+        const avatarR = 78;
 
         const avatarImg = await loadImage(state.avatar);
         const photoImgs = {};
@@ -3484,29 +3607,36 @@
           if (state.photos[t.id]) photoImgs[t.id] = await loadImage(state.photos[t.id]);
         }
 
-        // Measure height with a temp canvas
         const measure = document.createElement("canvas").getContext("2d");
-        let y = pad;
+        let y = pad + 8;
 
-        y += 90; // hero
-        measure.font = "500 28px 'Noto Sans SC', sans-serif";
-        const summary = `兹证明特工「${name}」已圆满完成${currentLoc.reportProve}全部 ${TASKS.length} 项时空任务，累计打卡照片 ${photoCount()} 张。以好奇之心探索景点奥秘，以镜头记录文化之美。特授予荣誉称号——${currentLoc.role}。`;
-        y += 24 + wrapText(measure, summary, contentW - 32).length * 30 + 28;
+        // hero: avatar + name + chips
+        y += avatarR * 2 + 28;
+        y += 48; // name
+        y += 36; // chips
+        y += 28; // date
+        y += 24;
 
-        for (const t of TASKS) {
-          y += 36; // title
-          y += 26; // place
-          y += state.photos[t.id] ? 280 : 36;
-          measure.font = "400 26px 'Noto Sans SC', sans-serif";
+        for (let i = 0; i < TASKS.length; i++) {
+          const t = TASKS[i];
+          const img = photoImgs[t.id];
+          const photoH = img
+            ? Math.min(i % 3 === 0 ? 460 : 340, Math.round(contentW * (img.height / img.width)))
+            : 100;
+          // clamp photo height to flexible range
+          const h = img ? Math.max(240, Math.min(i % 3 === 0 ? 480 : 360, photoH || 320)) : 100;
+          y += h + 12; // photo with overlay title inside
+          measure.font = "400 22px 'Noto Sans SC', sans-serif";
           const story = REPORT_COPY[t.id] || t.short;
-          y += wrapText(measure, story, contentW).length * 30 + 8;
+          const storyLines = wrapText(measure, story, contentW - 24).slice(0, 2);
+          y += 16 + storyLines.length * 28;
           if (state.notes[t.id]) {
-            measure.font = "italic 24px 'Noto Sans SC', sans-serif";
-            y += wrapText(measure, `特工手记：${state.notes[t.id]}`, contentW).length * 28 + 8;
+            measure.font = "italic 20px 'Noto Sans SC', sans-serif";
+            y += wrapText(measure, `特工手记：${state.notes[t.id]}`, contentW - 24).slice(0, 2).length * 26 + 6;
           }
-          y += 28;
+          y += 22;
         }
-        y += 120; // footer
+        y += 110; // footer
         y += pad;
 
         const H = Math.ceil(y);
@@ -3517,147 +3647,204 @@
         const ctx = canvas.getContext("2d");
         ctx.scale(scale, scale);
 
-        // background
         const bg = ctx.createLinearGradient(0, 0, 0, H);
-        bg.addColorStop(0, "#0e1a28");
-        bg.addColorStop(1, "#101018");
+        bg.addColorStop(0, "#0c1624");
+        bg.addColorStop(0.45, "#101a28");
+        bg.addColorStop(1, "#0a1018");
         ctx.fillStyle = bg;
         ctx.fillRect(0, 0, W, H);
 
-        // cyan frame
-        ctx.strokeStyle = "rgba(61,213,255,0.45)";
+        ctx.strokeStyle = "rgba(61,213,255,0.4)";
         ctx.lineWidth = 3;
-        roundRect(ctx, 12, 12, W - 24, H - 24, 18);
+        roundRect(ctx, 10, 10, W - 20, H - 20, 20);
         ctx.stroke();
 
-        let cy = pad;
+        let cy = pad + 16;
+        const cx = W / 2;
 
-        // hero
+        // avatar glow
+        const glow = ctx.createRadialGradient(cx, cy + avatarR, 20, cx, cy + avatarR, avatarR + 36);
+        glow.addColorStop(0, "rgba(240,193,75,0.45)");
+        glow.addColorStop(1, "rgba(240,193,75,0)");
+        ctx.fillStyle = glow;
+        ctx.beginPath();
+        ctx.arc(cx, cy + avatarR, avatarR + 36, 0, Math.PI * 2);
+        ctx.fill();
+
+        // avatar
+        ctx.save();
+        ctx.beginPath();
+        ctx.arc(cx, cy + avatarR, avatarR, 0, Math.PI * 2);
+        ctx.closePath();
+        ctx.clip();
         if (avatarImg) {
-          ctx.save();
-          ctx.beginPath();
-          ctx.arc(pad + 40, cy + 40, 40, 0, Math.PI * 2);
-          ctx.closePath();
-          ctx.clip();
-          const scale = Math.max(80 / avatarImg.width, 80 / avatarImg.height);
-          const dw = avatarImg.width * scale;
-          const dh = avatarImg.height * scale;
-          ctx.drawImage(avatarImg, pad + 40 - dw / 2, cy + 40 - dh / 2, dw, dh);
-          ctx.restore();
-          ctx.strokeStyle = "#f0c14b";
-          ctx.lineWidth = 3;
-          ctx.beginPath();
-          ctx.arc(pad + 40, cy + 40, 40, 0, Math.PI * 2);
-          ctx.stroke();
+          const s = Math.max((avatarR * 2) / avatarImg.width, (avatarR * 2) / avatarImg.height);
+          const dw = avatarImg.width * s;
+          const dh = avatarImg.height * s;
+          ctx.drawImage(avatarImg, cx - dw / 2, cy + avatarR - dh / 2, dw, dh);
         } else {
           ctx.fillStyle = "#1a2838";
-          ctx.beginPath();
-          ctx.arc(pad + 40, cy + 40, 40, 0, Math.PI * 2);
-          ctx.fill();
-          ctx.strokeStyle = "rgba(61,213,255,0.45)";
-          ctx.lineWidth = 2;
-          ctx.stroke();
+          ctx.fillRect(cx - avatarR, cy, avatarR * 2, avatarR * 2);
           ctx.fillStyle = "#7ae7ff";
-          ctx.font = "36px sans-serif";
+          ctx.font = "64px sans-serif";
           ctx.textAlign = "center";
-          ctx.fillText("🕵️", pad + 40, cy + 52);
-          ctx.textAlign = "left";
+          ctx.textBaseline = "middle";
+          ctx.fillText("🕵️", cx, cy + avatarR + 4);
+          ctx.textBaseline = "alphabetic";
         }
+        ctx.restore();
+
+        ctx.strokeStyle = "#f0c14b";
+        ctx.lineWidth = 5;
+        ctx.beginPath();
+        ctx.arc(cx, cy + avatarR, avatarR, 0, Math.PI * 2);
+        ctx.stroke();
+        ctx.strokeStyle = "rgba(61,213,255,0.55)";
+        ctx.lineWidth = 3;
+        ctx.beginPath();
+        ctx.arc(cx, cy + avatarR, avatarR + 6, 0, Math.PI * 2);
+        ctx.stroke();
+
+        cy += avatarR * 2 + 26;
 
         ctx.fillStyle = "#f4f8fc";
-        ctx.font = "400 40px 'Ma Shan Zheng', 'Noto Sans SC', cursive";
-        ctx.fillText(name, pad + 100, cy + 36);
-        ctx.fillStyle = "#3dd5ff";
-        ctx.font = "500 22px 'Noto Sans SC', sans-serif";
-        ctx.fillText(currentLoc.reportLabel, pad + 100, cy + 66);
-        ctx.fillStyle = "rgba(232,238,245,0.7)";
+        ctx.font = "400 48px 'Ma Shan Zheng', 'Noto Sans SC', cursive";
+        ctx.textAlign = "center";
+        ctx.fillText(name, cx, cy);
+        cy += 28;
+
+        // chips
+        const chips = [currentLoc.role, currentLoc.name, `📷 ${photoCount()} 张`];
+        ctx.font = "700 20px 'Noto Sans SC', sans-serif";
+        const chipGaps = 10;
+        const chipPads = chips.map((c) => ({
+          text: c,
+          w: ctx.measureText(c).width + 28,
+        }));
+        const chipsW = chipPads.reduce((a, c) => a + c.w, 0) + chipGaps * (chips.length - 1);
+        let chipX = cx - chipsW / 2;
+        chipPads.forEach((c, i) => {
+          const isGold = i === 0;
+          ctx.fillStyle = isGold ? "rgba(240,193,75,0.16)" : "rgba(61,213,255,0.12)";
+          ctx.strokeStyle = isGold ? "rgba(240,193,75,0.5)" : "rgba(61,213,255,0.4)";
+          ctx.lineWidth = 1.5;
+          roundRect(ctx, chipX, cy, c.w, 30, 15);
+          ctx.fill();
+          ctx.stroke();
+          ctx.fillStyle = isGold ? "#f0c14b" : "#7ae7ff";
+          ctx.fillText(c.text, chipX + c.w / 2, cy + 21);
+          chipX += c.w + chipGaps;
+        });
+        cy += 42;
+
+        ctx.fillStyle = "rgba(232,238,245,0.65)";
         ctx.font = "400 20px 'Noto Sans SC', sans-serif";
-        ctx.fillText(`签发日期：${formatReportDate()}`, pad + 100, cy + 92);
-        cy += 110;
+        ctx.fillText(`${currentLoc.reportLabel} · ${formatReportDate()}`, cx, cy);
+        ctx.textAlign = "left";
+        cy += 28;
 
-        // summary box
-        ctx.fillStyle = "rgba(61,213,255,0.1)";
-        ctx.strokeStyle = "rgba(61,213,255,0.25)";
-        ctx.lineWidth = 1.5;
-        measure.font = "500 24px 'Noto Sans SC', sans-serif";
-        const sumLines = wrapText(measure, summary, contentW - 32);
-        const sumH = 24 + sumLines.length * 30 + 16;
-        roundRect(ctx, pad, cy, contentW, sumH, 12);
-        ctx.fill();
-        ctx.stroke();
-        ctx.fillStyle = "rgba(232,238,245,0.9)";
-        ctx.font = "500 24px 'Noto Sans SC', sans-serif";
-        let ty = cy + 28;
-        for (const line of sumLines) {
-          ctx.fillText(line, pad + 16, ty);
-          ty += 30;
-        }
-        cy += sumH + 28;
-
-        // entries
-        for (const t of TASKS) {
-          ctx.fillStyle = "#f2f6fa";
-          ctx.font = "700 28px 'Noto Sans SC', sans-serif";
-          ctx.fillText(`${t.icon} ${t.title}`, pad, cy);
-          cy += 34;
-          ctx.fillStyle = "#3dd5ff";
-          ctx.font = "500 22px 'Noto Sans SC', sans-serif";
-          ctx.fillText(`📍 ${t.place}`, pad, cy);
-          cy += 18;
-
-          if (photoImgs[t.id]) {
-            cy += 8;
-            drawCover(ctx, photoImgs[t.id], pad, cy, contentW, 260, 14);
-            cy += 274;
+        // gallery
+        for (let i = 0; i < TASKS.length; i++) {
+          const t = TASKS[i];
+          const img = photoImgs[t.id];
+          const shortTitle = t.title.replace(/^任务[一二三四五六七八]：/, "");
+          let photoH = 280;
+          if (img) {
+            const natural = Math.round(contentW * (img.height / img.width));
+            photoH = Math.max(240, Math.min(i % 3 === 0 ? 480 : 360, natural || 320));
           } else {
-            cy += 8;
+            photoH = 110;
+          }
+
+          // card bg
+          const story = REPORT_COPY[t.id] || t.short;
+          ctx.font = "400 22px 'Noto Sans SC', sans-serif";
+          const storyLines = wrapText(ctx, story, contentW - 28).slice(0, 2);
+          let noteLines = [];
+          if (state.notes[t.id]) {
+            ctx.font = "italic 20px 'Noto Sans SC', sans-serif";
+            noteLines = wrapText(ctx, `特工手记：${state.notes[t.id]}`, contentW - 28).slice(0, 2);
+          }
+          const bodyH = 14 + storyLines.length * 28 + (noteLines.length ? noteLines.length * 26 + 6 : 0) + 14;
+          const cardH = photoH + bodyH;
+
+          ctx.fillStyle = "rgba(8,14,24,0.75)";
+          ctx.strokeStyle = "rgba(61,213,255,0.28)";
+          ctx.lineWidth = 1.5;
+          roundRect(ctx, pad, cy, contentW, cardH, 16);
+          ctx.fill();
+          ctx.stroke();
+
+          // photo clipped top of card
+          ctx.save();
+          roundRect(ctx, pad, cy, contentW, photoH, 16);
+          ctx.clip();
+          // square top corners effectively by also filling
+          ctx.beginPath();
+          ctx.rect(pad, cy, contentW, photoH);
+          ctx.clip();
+          if (img) {
+            const scale = Math.max(contentW / img.width, photoH / img.height);
+            const dw = img.width * scale;
+            const dh = img.height * scale;
+            ctx.drawImage(img, pad + (contentW - dw) / 2, cy + (photoH - dh) / 2, dw, dh);
+          } else {
+            ctx.fillStyle = "#0a121c";
+            ctx.fillRect(pad, cy, contentW, photoH);
             ctx.fillStyle = "rgba(232,238,245,0.55)";
             ctx.font = "400 22px 'Noto Sans SC', sans-serif";
-            ctx.fillText("（本关暂无打卡照片）", pad, cy + 20);
-            cy += 40;
+            ctx.textAlign = "center";
+            ctx.fillText("📷 本关暂无打卡照片", cx, cy + photoH / 2);
+            ctx.textAlign = "left";
           }
+          // gradient overlay
+          const g = ctx.createLinearGradient(0, cy + photoH - 90, 0, cy + photoH);
+          g.addColorStop(0, "rgba(4,10,18,0)");
+          g.addColorStop(1, "rgba(4,10,18,0.88)");
+          ctx.fillStyle = g;
+          ctx.fillRect(pad, cy + photoH - 90, contentW, 90);
+          ctx.fillStyle = "#fff";
+          ctx.font = "700 26px 'Noto Sans SC', sans-serif";
+          ctx.fillText(`${t.icon} ${shortTitle}`, pad + 16, cy + photoH - 36);
+          ctx.fillStyle = "#7ae7ff";
+          ctx.font = "500 18px 'Noto Sans SC', sans-serif";
+          ctx.fillText(`📍 ${t.place}`, pad + 16, cy + photoH - 12);
+          ctx.restore();
 
-          const story = REPORT_COPY[t.id] || t.short;
-          ctx.fillStyle = "rgba(232,238,245,0.85)";
-          ctx.font = "400 24px 'Noto Sans SC', sans-serif";
-          for (const line of wrapText(ctx, story, contentW)) {
-            ctx.fillText(line, pad, cy + 20);
-            cy += 30;
+          let ty = cy + photoH + 22;
+          ctx.fillStyle = "rgba(232,238,245,0.78)";
+          ctx.font = "400 22px 'Noto Sans SC', sans-serif";
+          for (const line of storyLines) {
+            ctx.fillText(line, pad + 14, ty);
+            ty += 28;
           }
-
-          if (state.notes[t.id]) {
-            cy += 6;
+          if (noteLines.length) {
+            ty += 4;
             ctx.fillStyle = "#f0c14b";
-            ctx.font = "italic 22px 'Noto Sans SC', sans-serif";
-            for (const line of wrapText(ctx, `特工手记：${state.notes[t.id]}`, contentW)) {
-              ctx.fillText(line, pad, cy + 18);
-              cy += 28;
+            ctx.font = "italic 20px 'Noto Sans SC', sans-serif";
+            for (const line of noteLines) {
+              ctx.fillText(line, pad + 14, ty);
+              ty += 26;
             }
           }
 
-          cy += 12;
-          ctx.strokeStyle = "rgba(61,213,255,0.2)";
-          ctx.beginPath();
-          ctx.moveTo(pad, cy);
-          ctx.lineTo(pad + contentW, cy);
-          ctx.stroke();
-          cy += 22;
+          cy += cardH + 18;
         }
 
         // footer
-        ctx.fillStyle = "rgba(240,193,75,0.15)";
+        ctx.fillStyle = "rgba(240,193,75,0.14)";
         ctx.strokeStyle = "rgba(240,193,75,0.4)";
-        roundRect(ctx, pad, cy, contentW, 100, 12);
+        roundRect(ctx, pad, cy, contentW, 96, 14);
         ctx.fill();
         ctx.stroke();
+        ctx.textAlign = "center";
         ctx.fillStyle = "#f0c14b";
         ctx.font = "400 34px 'Ma Shan Zheng', 'Noto Sans SC', cursive";
-        ctx.textAlign = "center";
-        ctx.fillText(currentLoc.rewardTitle, W / 2, cy + 40);
+        ctx.fillText(currentLoc.rewardTitle, cx, cy + 38);
         ctx.fillStyle = "rgba(232,238,245,0.8)";
-        ctx.font = "400 22px 'Noto Sans SC', sans-serif";
-        ctx.fillText("把这份报告讲给爸爸妈妈听，兑换一份神秘奖励吧！", W / 2, cy + 70);
-        ctx.fillText(`—— ${currentLoc.name}时空特工系统`, W / 2, cy + 94);
+        ctx.font = "400 20px 'Noto Sans SC', sans-serif";
+        ctx.fillText("以镜头记录旅途，把这份相册讲给爸爸妈妈听吧！", cx, cy + 66);
+        ctx.fillText(`—— ${currentLoc.name}时空特工系统`, cx, cy + 88);
         ctx.textAlign = "left";
 
         const a = document.createElement("a");
@@ -3777,7 +3964,7 @@
         document.getElementById("profileError").classList.remove("show");
       } catch (_) {
         const err = document.getElementById("profileError");
-        err.textContent = "头像上传失败，换一张试试～";
+        err.textContent = "头像拍照失败，再试一次～";
         err.classList.add("show");
       }
     }
@@ -3788,17 +3975,11 @@
       e.target.value = "";
     });
 
-    document.getElementById("welcomeAvatarAlbum").addEventListener("change", async (e) => {
-      const file = e.target.files?.[0];
-      if (file) await applyWelcomeAvatar(file);
-      e.target.value = "";
-    });
-
     document.getElementById("startBtn").addEventListener("click", () => {
       const nick = (document.getElementById("nickInput").value || "").trim();
       const err = document.getElementById("profileError");
       if (!pendingAvatar && !state.avatar) {
-        err.textContent = "请先上传一张头像～";
+        err.textContent = "请先拍照设置头像～";
         err.classList.add("show");
         return;
       }
