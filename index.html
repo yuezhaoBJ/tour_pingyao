@@ -1490,6 +1490,45 @@
     }
 
     .spot-tab.cleared .spot-done { color: var(--success); }
+
+    .save-pill {
+      font-size: 0.72rem !important;
+      color: rgba(122, 231, 255, 0.85) !important;
+      border-color: rgba(61, 213, 255, 0.22) !important;
+    }
+
+    .save-pill.ok { color: var(--success) !important; border-color: rgba(61, 214, 140, 0.35) !important; }
+    .save-pill.err { color: #ff8a80 !important; border-color: rgba(239, 83, 80, 0.4) !important; }
+
+    .save-toast {
+      position: fixed;
+      left: 50%;
+      bottom: 1.35rem;
+      transform: translateX(-50%) translateY(12px);
+      z-index: 1200;
+      padding: 0.55rem 1rem;
+      border-radius: 999px;
+      background: rgba(8, 18, 30, 0.94);
+      border: 1px solid rgba(61, 213, 255, 0.45);
+      color: #7ae7ff;
+      font-size: 0.82rem;
+      font-weight: 700;
+      box-shadow: 0 8px 28px rgba(0, 0, 0, 0.45);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.25s ease, transform 0.25s ease;
+      white-space: nowrap;
+    }
+
+    .save-toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    .save-toast.err {
+      color: #ffcdd2;
+      border-color: rgba(239, 83, 80, 0.55);
+    }
   </style>
 </head>
 <body>
@@ -1541,11 +1580,14 @@
           <span class="dot" aria-hidden="true"></span>
           <span id="statusText">特工状态：任务进行中</span>
         </div>
+        <div class="status-pill save-pill" id="savePill" title="进度保存在本机浏览器 localStorage">💾 进度自动保存</div>
         <div class="status-pill" id="readyPill">准备好接受任务了吗？</div>
-        <button type="button" class="btn-reset" id="resetBtn">重置进度</button>
+        <button type="button" class="btn-reset" id="resetBtn">重置本景点</button>
       </footer>
     </div>
   </div>
+
+  <div class="save-toast" id="saveToast" role="status" aria-live="polite">进度已保存</div>
 
   <!-- Welcome -->
   <div class="overlay open" id="welcomeOverlay" role="dialog" aria-modal="true" aria-labelledby="welcomeTitle">
@@ -1585,7 +1627,7 @@
         </div>
         <div class="info-block knowledge-box">
           <h3>🎮 怎么玩</h3>
-          <p>1. 设置头像与昵称<br />2. 点选上方景点切换任务清单<br />3. 热身闯关 + 知识问答 + 拍照打卡<br />4. 本景点全部完成后生成图文报告</p>
+          <p>1. 设置头像与昵称<br />2. 点选上方景点切换任务清单<br />3. 热身闯关 + 知识问答 + 拍照打卡<br />4. 进度自动保存在本机，下次打开可继续<br />5. 本景点全部完成后生成图文报告</p>
         </div>
         <div class="modal-actions">
           <button type="button" class="btn-primary" id="startBtn" style="flex:1">接受任务，出发！</button>
@@ -1796,7 +1838,7 @@
             content: "王家大院位于灵石县静升镇，是规模宏大的明清民居建筑群。先找到高家崖或红门堡的入口，观察门楼、抱鼓石和匾额，想象当年晋商家族进出的场景。",
             challenge: "在堡门或门楼前拍一张报到打卡照。",
             knowledge: "王家大院被誉为「华夏民居第一宅」「民间故宫」，主要由高家崖、红门堡等堡院组成，院落众多、依山而建。",
-            interact: "choice", cover: "assets/tasks/task1.jpg",
+            interact: "choice", cover: "assets/tasks/wangjia/task1.jpg",
             warmup: {
               title: "🔎 民间故宫在哪？",
               hint: "王家大院最常被称作什么？",
@@ -1821,7 +1863,7 @@
             content: "沿着巷道走进一座座院落，注意「前低后高、层层递进」的布局。红门堡的整体平面据说像一个巨大的「王」字，彰显家族姓氏。数一数你经过了几进院子。",
             challenge: "在院落或巷道中拍一张「迷宫探险」打卡照。",
             knowledge: "大院有上百座院落、上千间房屋，堡墙环绕，既是家宅也是防御工事。红门堡布局含「王」字形意象。",
-            interact: "choice", cover: "assets/tasks/task2.jpg",
+            interact: "choice", cover: "assets/tasks/wangjia/task2.jpg",
             warmup: {
               title: "🧭 认路小测试",
               hint: "红门堡平面布局最常被说成像哪个字？",
@@ -1846,7 +1888,7 @@
             content: "王家大院以砖雕、木雕、石雕「三雕」闻名。仔细观察照壁、门窗、柱础和屋脊上的图案，看看有没有狮子、花卉、人物故事。选一块你最喜欢的雕刻，说说它像什么。",
             challenge: "拍一张最喜欢的三雕特写打卡照。",
             knowledge: "三雕装饰既好看又有寓意，比如狮子常象征守护与吉祥。精美雕刻让大院成为民居艺术博物馆。",
-            interact: "choice", cover: "assets/tasks/task5.jpg",
+            interact: "choice", cover: "assets/tasks/wangjia/task3.jpg",
             warmup: {
               title: "🎁 三雕是哪三雕？",
               hint: "选出正确的一组。",
@@ -1871,7 +1913,7 @@
             content: "晋商家族重视读书、诚信与家规。参观祠堂或相关展陈，看看牌位、匾额和介绍文字，想想「家风」为什么对一个大家族很重要。",
             challenge: "在祠堂或家风相关展区拍一张打卡照（请保持安静礼貌）。",
             knowledge: "王家曾是显赫官商，大院建造历时数百年。家祠与匾额常提醒后人：做人做事要守规矩、重德行。",
-            interact: "text", cover: "assets/tasks/task4.jpg",
+            interact: "text", cover: "assets/tasks/wangjia/task4.jpg",
             warmup: {
               title: "✍️ 家风一句话",
               hint: "用至少 6 个字，写下你理解的「好家风」。",
@@ -1892,7 +1934,7 @@
             content: "寻找可以登高的位置（注意安全，听从景区指引），俯瞰大院屋脊连绵如海的景象。对比平地上的「迷宫感」和高处的「格局感」。",
             challenge: "拍一张俯瞰屋脊或远眺静升镇的打卡照。",
             knowledge: "从高处看，更能理解城堡式民居如何依山布局、巷堡相连。这也是「华夏民居第一宅」气势的来源。",
-            interact: "choice", cover: "assets/tasks/task7.jpg",
+            interact: "choice", cover: "assets/tasks/wangjia/task5.jpg",
             warmup: {
               title: "👀 高处看什么？",
               hint: "登高瞭望时，最壮观的画面通常是？",
@@ -1917,7 +1959,7 @@
             content: "回顾今天走过的门楼、巷道、三雕与瞭望点，选出最打动你的一个角落：可能是一扇窗、一块照壁，或一进安静的小院。",
             challenge: "为「心头好」拍一张打卡照，并在热身里写下理由。",
             knowledge: "旅行不只是打卡数量，更是发现属于自己的美。王家大院的价值，在于把建筑、艺术与家风融为一体。",
-            interact: "text", cover: "assets/tasks/task6.jpg",
+            interact: "text", cover: "assets/tasks/wangjia/task6.jpg",
             warmup: {
               title: "💖 我的心头好",
               hint: "写下最喜欢的角落 + 理由（至少 8 个字）。",
@@ -1961,7 +2003,7 @@
             content: "绵山因介子推的故事而闻名。传说介子推忠贞隐居山林，后来寒食节不生火做饭的习俗与这段历史相关。先在入口或展区了解这个故事的大意。",
             challenge: "拍一张山门、介公主题雕塑或介绍牌的打卡照。",
             knowledge: "寒食节是中国传统节日之一，有「禁火冷食」的习俗，常与介子推的故事联系在一起。绵山因此成为重要的历史文化名山。",
-            interact: "choice", cover: "assets/tasks/task4.jpg",
+            interact: "choice", cover: "assets/tasks/mianshan/task1.jpg",
             warmup: {
               title: "🔥 寒食小问答",
               hint: "寒食节传统习俗更接近哪一种？",
@@ -1986,7 +2028,7 @@
             content: "绵山山势陡峭，许多寺庙建在悬崖之上。可以乘坐索道登高，或沿步道缓缓上行（量力而行）。一路观察山岩、松树与云雾的变化。",
             challenge: "拍一张索道、步道或云中山景打卡照。",
             knowledge: "索道能帮助游客更轻松到达高处景区。无论乘索道还是步行，都要注意安全，抓紧扶手，不拥挤推搡。",
-            interact: "choice", cover: "assets/tasks/task1.jpg",
+            interact: "choice", cover: "assets/tasks/mianshan/task2.jpg",
             warmup: {
               title: "🚠 安全特工守则",
               hint: "乘索道或登山时，正确做法是？",
@@ -2011,7 +2053,7 @@
             content: "参观云峰寺或其他主要寺庙建筑，观察它们如何贴着山势建造。保持安静，感受山林与香火交织的氛围（请尊重宗教场所礼仪）。",
             challenge: "拍一张寺庙外观或山寺同框的打卡照（勿扰他人礼佛）。",
             knowledge: "绵山佛道文化深厚，古建与自然融为一体。参观寺庙时应衣着得体、不大声喧哗、不乱摸佛像。",
-            interact: "choice", cover: "assets/tasks/task3.jpg",
+            interact: "choice", cover: "assets/tasks/mianshan/task3.jpg",
             warmup: {
               title: "🛕 礼寺小提示",
               hint: "进入寺庙最合适的行为是？",
@@ -2036,7 +2078,7 @@
             content: "抱腹岩是绵山著名奇观：巨大岩腹仿佛张开双臂，把建筑或空间「抱」在怀中。站在观景点，感受大自然的力量。",
             challenge: "拍一张能看出「岩腹」气势的打卡照。",
             knowledge: "喀斯特与构造运动塑造了绵山奇特地貌。抱腹岩因形似「抱腹」得名，是孩子们最容易记住的地质名片。",
-            interact: "choice", cover: "assets/tasks/task2.jpg",
+            interact: "choice", cover: "assets/tasks/mianshan/task4.jpg",
             warmup: {
               title: "🪨 奇岩认名",
               hint: "「抱腹岩」名字最可能来自？",
@@ -2061,7 +2103,7 @@
             content: "如果行程包含水涛沟或山间瀑布栈道，停下脚步仔细听水声，看看水流如何从岩壁间跌落。夏天尤其清凉。",
             challenge: "拍一张溪瀑、栈道或水花的打卡照（地面湿滑，慢行）。",
             knowledge: "水塑造山谷，也滋养植被。听泉观瀑是认识水文与山地生态的好机会。湿滑路段请防滑慢行。",
-            interact: "choice", cover: "assets/tasks/task7.jpg",
+            interact: "choice", cover: "assets/tasks/mianshan/task5.jpg",
             warmup: {
               title: "👂 听泉辨声",
               hint: "靠近瀑布时，正确且安全的做法是？",
@@ -2086,7 +2128,7 @@
             content: "回顾寒食故事、登云之路、古寺与奇岩水声，选出今天最难忘的一个瞬间，写成特工手记。",
             challenge: "拍一张你最满意的山景收官照，并完成手记热身。",
             knowledge: "旅行手记能帮你把风景变成记忆。绵山把忠义传说、宗教古建与自然奇观编织在一起，值得慢慢回味。",
-            interact: "text", cover: "assets/tasks/task6.jpg",
+            interact: "text", cover: "assets/tasks/mianshan/task6.jpg",
             warmup: {
               title: "📝 今日山中印象",
               hint: "至少写 8 个字，记录最难忘的瞬间。",
@@ -2130,7 +2172,7 @@
             content: "黄河流到此处，河床骤然收窄，浊浪从高处跌落，形如巨壶口在沸腾，因此叫「壶口瀑布」。先安全地站在观景区域，整体感受它的气势。",
             challenge: "拍一张能看见主瀑水花与气势的打卡照。",
             knowledge: "壶口瀑布是黄河上著名的大瀑布，也是世界上少有的黄色瀑布景观。河水含沙量高，所以呈现独特的金黄色。",
-            interact: "choice", cover: "assets/tasks/task7.jpg",
+            interact: "choice", cover: "assets/tasks/hukou/task1.jpg",
             warmup: {
               title: "🌊 名字从哪来？",
               hint: "「壶口」这个名字最形象的解释是？",
@@ -2155,7 +2197,7 @@
             content: "壶口瀑布声如雷鸣，数里可闻。找一个相对安全、不太拥挤的位置，安静听 10 秒：是低沉的轰鸣，还是碎裂的水声？和爸爸妈妈说说你的感觉。",
             challenge: "拍一张「听涛」姿势合影或水雾弥漫的场景照。",
             knowledge: "巨大落差与狭窄河道让水流能量集中，冲击岩石产生强声与水雾。这也是认识「势能→动能」的生动课堂。",
-            interact: "choice", cover: "assets/tasks/task3.jpg",
+            interact: "choice", cover: "assets/tasks/hukou/task2.jpg",
             warmup: {
               title: "👂 声音从哪来？",
               hint: "瀑布轰鸣的主要原因是？",
@@ -2180,7 +2222,7 @@
             content: "壶口之下，河水在狭窄石槽中奔腾，人们常称相关峡谷段为「龙槽」。观察河道由宽变窄的过程，想象巨龙在槽中翻滚。",
             challenge: "拍一张能看出河道狭窄/石槽走向的打卡照。",
             knowledge: "长期冲刷使河床形成深槽，河面宽阔的黄河在壶口被约束，落差与流速增大，造就磅礴瀑布。",
-            interact: "choice", cover: "assets/tasks/task2.jpg",
+            interact: "choice", cover: "assets/tasks/hukou/task3.jpg",
             warmup: {
               title: "🐉 龙槽是什么？",
               hint: "「龙槽」更接近哪一种描述？",
@@ -2205,7 +2247,7 @@
             content: "在条件允许时远眺孟门山——它矗立于河中，有「黄河之门」的说法。想想为什么坚硬的岩石能在急流中屹立。",
             challenge: "拍一张孟门山或河心岩石的远眺打卡照。",
             knowledge: "孟门山是黄河中的著名奇观，见证河床变迁与岩石抗蚀。不同水位时，景象也会不同。",
-            interact: "choice", cover: "assets/tasks/task1.jpg",
+            interact: "choice", cover: "assets/tasks/hukou/task4.jpg",
             warmup: {
               title: "🏝️ 河心石头",
               hint: "孟门山最特别的地方是？",
@@ -2230,7 +2272,7 @@
             content: "晴天时，瀑布水雾在阳光照射下可能出现彩虹。变换站位与角度，耐心寻找。即使没有彩虹，水雾折射的光晕也值得记录。",
             challenge: "拍一张彩虹、水雾光晕，或阳光穿透水雾的照片。",
             knowledge: "彩虹是阳光在水滴中折射、反射形成的光学现象。壶口的水雾为观察彩虹提供了天然实验室。",
-            interact: "choice", cover: "assets/tasks/task5.jpg",
+            interact: "choice", cover: "assets/tasks/hukou/task5.jpg",
             warmup: {
               title: "🌈 彩虹怎么来？",
               hint: "瀑布边看见彩虹，主要需要？",
@@ -2255,7 +2297,7 @@
             content: "黄河是中华民族的母亲河。回顾今天的怒涛、龙槽、孟门与彩虹，用一句真诚的话，写下你对黄河的祝福或感受。",
             challenge: "拍一张收官合影或最震撼的黄河照，并完成手记。",
             knowledge: "认识黄河，既要感受它的壮美，也要理解保护母亲河、珍惜水资源的责任。小特工也可以做环保宣传员。",
-            interact: "text", cover: "assets/tasks/task6.jpg",
+            interact: "text", cover: "assets/tasks/hukou/task6.jpg",
             warmup: {
               title: "💛 给黄河的话",
               hint: "至少写 8 个字的祝福或感受。",
@@ -2297,6 +2339,7 @@
     let state = loadState();
     /** @type {Record<number, { warmUp: boolean, quizIdx: number }>} */
     let session = {};
+    let saveToastTimer = null;
     syncLocationData();
 
     function snapshotProgress() {
@@ -2310,10 +2353,101 @@
 
     function applyProgress(p) {
       const src = p || emptyProgress();
-      state.done = { ...(src.done || {}) };
-      state.notes = { ...(src.notes || {}) };
-      state.challengeOk = { ...(src.challengeOk || {}) };
-      state.photos = { ...(src.photos || {}) };
+      state.done = normalizeIdMap(src.done);
+      state.notes = normalizeIdMap(src.notes);
+      state.challengeOk = normalizeIdMap(src.challengeOk);
+      state.photos = normalizeIdMap(src.photos);
+    }
+
+    /** JSON 会把数字 key 变成字符串，统一转回数字 key */
+    function normalizeIdMap(obj) {
+      const out = {};
+      if (!obj || typeof obj !== "object") return out;
+      Object.keys(obj).forEach((k) => {
+        const n = Number(k);
+        out[Number.isFinite(n) ? n : k] = obj[k];
+      });
+      return out;
+    }
+
+    function normalizeSpots(spots) {
+      const out = {};
+      Object.keys(spots || {}).forEach((id) => {
+        const s = spots[id] || {};
+        out[id] = {
+          done: normalizeIdMap(s.done),
+          notes: normalizeIdMap(s.notes),
+          challengeOk: normalizeIdMap(s.challengeOk),
+          photos: normalizeIdMap(s.photos),
+        };
+      });
+      return out;
+    }
+
+    function buildPersistPayload() {
+      state.spots = state.spots || {};
+      state.spots[state.locationId] = snapshotProgress();
+      return {
+        nickname: state.nickname || "",
+        avatar: state.avatar || "",
+        welcomed: !!state.welcomed,
+        locationId: state.locationId || "pingyao",
+        spots: state.spots,
+        savedAt: Date.now(),
+        version: 5,
+      };
+    }
+
+    /** 配额不够时：去掉非当前景点的照片，尽量保住关卡进度 */
+    function slimPersistPayload(payload) {
+      const slimSpots = {};
+      Object.keys(payload.spots || {}).forEach((id) => {
+        const s = payload.spots[id] || emptyProgress();
+        slimSpots[id] = {
+          done: { ...(s.done || {}) },
+          notes: { ...(s.notes || {}) },
+          challengeOk: { ...(s.challengeOk || {}) },
+          photos: id === payload.locationId ? { ...(s.photos || {}) } : {},
+        };
+      });
+      return { ...payload, spots: slimSpots, slimmed: true };
+    }
+
+    function formatSavedAt(ts) {
+      if (!ts) return "尚未保存";
+      const diff = Date.now() - ts;
+      if (diff < 15_000) return "刚刚已保存";
+      if (diff < 60_000) return `${Math.floor(diff / 1000)} 秒前已保存`;
+      if (diff < 3600_000) return `${Math.floor(diff / 60000)} 分钟前已保存`;
+      const d = new Date(ts);
+      const hh = String(d.getHours()).padStart(2, "0");
+      const mm = String(d.getMinutes()).padStart(2, "0");
+      if (d.toDateString() === new Date().toDateString()) return `今天 ${hh}:${mm} 已保存`;
+      return `${d.getMonth() + 1}/${d.getDate()} ${hh}:${mm} 已保存`;
+    }
+
+    function updateSavePill(ok, ts) {
+      const el = document.getElementById("savePill");
+      if (!el) return;
+      el.classList.remove("ok", "err");
+      if (ok === false) {
+        el.classList.add("err");
+        el.textContent = "⚠️ 保存失败";
+        return;
+      }
+      if (ok === true) el.classList.add("ok");
+      const t = ts ?? state.savedAt;
+      el.textContent = t ? `💾 ${formatSavedAt(t)}` : "💾 进度自动保存";
+    }
+
+    function flashSaveToast(ok, msg) {
+      const el = document.getElementById("saveToast");
+      if (!el) return;
+      el.textContent = msg || (ok ? "进度已保存到本机" : "保存失败，请清理空间后重试");
+      el.classList.toggle("err", !ok);
+      el.classList.add("show");
+      if (saveToastTimer) clearTimeout(saveToastTimer);
+      saveToastTimer = setTimeout(() => el.classList.remove("show"), 1800);
     }
 
     function loadState() {
@@ -2338,13 +2472,14 @@
                   photos: old.photos || {},
                 },
               },
+              savedAt: Date.now(),
             };
           }
         }
 
         if (parsed) {
           const locationId = parsed.locationId || "pingyao";
-          const spots = parsed.spots || {};
+          let spots = parsed.spots || {};
           if (!spots.pingyao && (parsed.done || parsed.photos)) {
             spots.pingyao = {
               done: parsed.done || {},
@@ -2353,6 +2488,7 @@
               photos: parsed.photos || {},
             };
           }
+          spots = normalizeSpots(spots);
           const progress = spots[locationId] || emptyProgress();
           return {
             nickname: parsed.nickname || "",
@@ -2360,10 +2496,11 @@
             welcomed: !!parsed.welcomed,
             locationId,
             spots,
-            done: { ...(progress.done || {}) },
-            notes: { ...(progress.notes || {}) },
-            challengeOk: { ...(progress.challengeOk || {}) },
-            photos: { ...(progress.photos || {}) },
+            savedAt: parsed.savedAt || null,
+            done: normalizeIdMap(progress.done),
+            notes: normalizeIdMap(progress.notes),
+            challengeOk: normalizeIdMap(progress.challengeOk),
+            photos: normalizeIdMap(progress.photos),
           };
         }
       } catch (_) {}
@@ -2373,23 +2510,39 @@
         welcomed: false,
         locationId: "pingyao",
         spots: {},
+        savedAt: null,
         ...emptyProgress(),
       };
     }
 
-    function saveState() {
+    function saveState(opts = {}) {
+      const showToast = opts.toast === true;
+      const payload = buildPersistPayload();
       try {
-        state.spots = state.spots || {};
-        state.spots[state.locationId] = snapshotProgress();
-        localStorage.setItem(STORAGE_KEY, JSON.stringify({
-          nickname: state.nickname,
-          avatar: state.avatar,
-          welcomed: state.welcomed,
-          locationId: state.locationId,
-          spots: state.spots,
-        }));
-      } catch (err) {
-        alert("相册存储空间有点满啦，试试换一张更小的照片，或重置进度后再打卡～");
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
+        state.savedAt = payload.savedAt;
+        updateSavePill(true, payload.savedAt);
+        if (showToast) flashSaveToast(true, opts.message || "进度已保存到本机");
+        return true;
+      } catch (_) {
+        try {
+          const slim = slimPersistPayload(payload);
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(slim));
+          state.spots = slim.spots;
+          applyProgress(slim.spots[slim.locationId] || emptyProgress());
+          state.savedAt = slim.savedAt;
+          updateSavePill(true, slim.savedAt);
+          flashSaveToast(true, "空间不足，已精简其他景点照片后保存");
+          if (showToast || opts.warnQuota !== false) {
+            alert("浏览器存储空间有点满：已优先保存当前进度；其他景点的打卡照片可能被清空，关卡勾选仍保留。");
+          }
+          return true;
+        } catch (err2) {
+          updateSavePill(false);
+          flashSaveToast(false);
+          alert("保存失败：本机存储已满。请删除部分打卡照片，或点「重置本景点」后再试。");
+          return false;
+        }
       }
     }
 
@@ -2711,7 +2864,7 @@
         try {
           const dataUrl = await compressImage(file);
           state.photos[id] = dataUrl;
-          saveState();
+          saveState({ toast: true, message: "打卡照片已存入本机进度" });
           const wrap = document.getElementById("photoPreviewWrap");
           const img = document.getElementById("photoPreview");
           if (img) img.src = dataUrl;
@@ -3151,7 +3304,7 @@
       }
       const already = !!state.done[id];
       state.done[id] = true;
-      saveState();
+      saveState({ toast: true, message: "任务进度已保存" });
       renderGrid();
       updateProgress();
       closeOverlay("taskOverlay");
@@ -3657,7 +3810,7 @@
       state.nickname = nick.slice(0, 12);
       state.avatar = pendingAvatar || state.avatar;
       state.welcomed = true;
-      saveState();
+      saveState({ toast: true, message: "特工档案已保存，下次打开可继续" });
       updateAgentBar();
       closeOverlay("welcomeOverlay");
       playBeep(740, 0.1);
@@ -3669,7 +3822,7 @@
       applyProgress(emptyProgress());
       state.spots[state.locationId] = emptyProgress();
       session = {};
-      saveState();
+      saveState({ toast: true, message: `已清空「${locName}」进度` });
       renderSpotNav();
       renderGrid();
       updateProgress();
@@ -3681,6 +3834,17 @@
     renderSpotNav();
     renderGrid();
     updateProgress();
+    updateSavePill(!!state.savedAt, state.savedAt);
+
+    // 离开页面 / 切到后台时再落盘一次，防止漏存
+    const flushSave = () => { try { saveState(); } catch (_) {} };
+    window.addEventListener("pagehide", flushSave);
+    document.addEventListener("visibilitychange", () => {
+      if (document.visibilityState === "hidden") flushSave();
+      else updateSavePill(!!state.savedAt, state.savedAt);
+    });
+    setInterval(() => updateSavePill(!!state.savedAt, state.savedAt), 30_000);
+
     if (state.welcomed && state.nickname && state.avatar) {
       closeOverlay("welcomeOverlay");
       updateAgentBar();
