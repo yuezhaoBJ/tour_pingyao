@@ -1584,8 +1584,9 @@
       content: "🔍";
       position: absolute;
       top: 0.5rem;
-      left: 0.5rem;
-      z-index: 2;
+      right: 0.5rem;
+      left: auto;
+      z-index: 3;
       width: 1.7rem;
       height: 1.7rem;
       display: grid;
@@ -1695,6 +1696,20 @@
       color: rgba(180, 230, 255, 0.88);
     }
 
+    #photoViewOverlay .photo-view-actions {
+      display: flex;
+      gap: 0.55rem;
+      justify-content: center;
+      flex-wrap: wrap;
+      width: 100%;
+      padding: 0 0.25rem 0.15rem;
+    }
+
+    #photoViewOverlay .photo-view-actions .btn-primary,
+    #photoViewOverlay .photo-view-actions .btn-ghost {
+      margin: 0;
+    }
+
     /* 错落高度：奇偶卡片略不同裁切，增强瀑布感 */
     .report-entry:nth-child(3n + 1) .photo-stage img { aspect-ratio: 3 / 4; object-fit: cover; }
     .report-entry:nth-child(3n + 2) .photo-stage img { aspect-ratio: 4 / 3; object-fit: cover; }
@@ -1756,6 +1771,59 @@
       -webkit-backdrop-filter: blur(4px);
       text-shadow: 0 1px 2px rgba(0, 0, 0, 0.55);
       pointer-events: none;
+    }
+
+    .report-entry .photo-stamp-agent {
+      position: absolute;
+      left: 0.5rem;
+      top: 0.5rem;
+      bottom: auto;
+      z-index: 2;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      max-width: calc(100% - 1rem);
+      padding: 0.28rem 0.45rem 0.28rem 0.28rem;
+      border-radius: 999px;
+      background: rgba(0, 0, 0, 0.5);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      backdrop-filter: blur(4px);
+      -webkit-backdrop-filter: blur(4px);
+      pointer-events: none;
+    }
+
+    .report-entry .photo-stamp-agent img {
+      width: 1.7rem;
+      height: 1.7rem;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 1.5px solid #f0c14b;
+      flex-shrink: 0;
+      aspect-ratio: 1;
+      max-height: none;
+    }
+
+    .report-entry .photo-stamp-agent .stamp-lines {
+      min-width: 0;
+      line-height: 1.15;
+    }
+
+    .report-entry .photo-stamp-agent .stamp-place {
+      font-size: 0.58rem;
+      font-weight: 700;
+      color: #7ae7ff;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .report-entry .photo-stamp-agent .stamp-time {
+      font-size: 0.54rem;
+      font-weight: 600;
+      color: rgba(255, 255, 255, 0.9);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
 
     .report-entry .entry-body {
@@ -2093,6 +2161,10 @@
       <div class="photo-view-caption">
         <h3 id="photoViewTitle"></h3>
         <p id="photoViewMeta"></p>
+      </div>
+      <div class="photo-view-actions">
+        <button type="button" class="btn-ghost" id="photoViewCloseBtn">关闭</button>
+        <button type="button" class="btn-primary" id="photoViewDownloadBtn">📥 下载打卡照</button>
       </div>
     </div>
   </div>
@@ -3820,6 +3892,17 @@
         const story = REPORT_COPY[t.id] || t.short;
         const shortTitle = t.title.replace(/^任务[一二三四五六七八]：/, "");
         const stamp = photo ? formatPhotoTime(state.photoTimes && state.photoTimes[t.id]) : "";
+        const agentStamp = photo && avatar
+          ? `<div class="photo-stamp-agent">
+              <img src="${avatar}" alt="" />
+              <div class="stamp-lines">
+                <div class="stamp-place">📍 ${escapeHtml(t.place)}</div>
+                ${stamp ? `<div class="stamp-time">🕒 ${escapeHtml(stamp)}</div>` : ""}
+              </div>
+            </div>`
+          : photo && stamp
+            ? `<div class="photo-stamp-time">${escapeHtml(stamp)}</div>`
+            : "";
         return `
           <article class="report-entry">
             <div class="photo-stage${photo ? " has-zoom" : " empty"}"${photo
@@ -3828,7 +3911,7 @@
               ${photo
                 ? `<img src="${photo}" alt="${escapeHtml(t.photo.title)}" loading="lazy" />`
                 : `<span>📷 本关暂无打卡照片</span>`}
-              ${stamp ? `<div class="photo-stamp-time">${escapeHtml(stamp)}</div>` : ""}
+              ${agentStamp}
               <div class="photo-meta">
                 <h4>${t.icon} ${escapeHtml(shortTitle)}</h4>
                 <div class="place">📍 ${escapeHtml(t.place)}</div>
@@ -3869,19 +3952,22 @@
         </div>
         <div class="modal-actions">
           <button type="button" class="btn-ghost" data-close="reportOverlay">关闭</button>
-          <button type="button" class="btn-primary" id="saveReportImgBtn" style="margin-left:auto">🖼️ 保存为图片</button>
+          <button type="button" class="btn-primary" id="saveReportImgBtn" style="margin-left:auto">📥 下载打卡相册</button>
         </div>
-        <p class="save-img-status" id="saveImgStatus">正在生成图片，请稍候…</p>
+        <p class="save-img-status" id="saveImgStatus">正在生成带水印的相册，请稍候…</p>
       `;
       openOverlay("reportOverlay");
       document.getElementById("saveReportImgBtn")?.addEventListener("click", () => saveReportAsImage());
       bindReportPhotoView();
     }
 
+    let viewingPhotoTaskId = null;
+
     function openPhotoView(taskId) {
       const t = TASKS.find((x) => x.id === taskId);
       const src = state.photos[taskId];
       if (!t || !src) return;
+      viewingPhotoTaskId = taskId;
       const shortTitle = t.title.replace(/^任务[一二三四五六七八]：/, "");
       const stamp = formatPhotoTime(state.photoTimes && state.photoTimes[taskId]);
       const img = document.getElementById("photoViewImg");
@@ -3952,6 +4038,154 @@
       ctx.closePath();
     }
 
+    /** 在照片区域绘制：特工头像 + 地点 + 打卡时间 水印 */
+    function drawCheckinWatermark(ctx, {
+      x, y, w, h, avatarImg, place, time, compact = false, anchor = "bottom",
+    }) {
+      if (!place && !time && !avatarImg) return;
+      const pad = Math.max(8, Math.round(w * (compact ? 0.028 : 0.022)));
+      const avR = Math.max(compact ? 14 : 22, Math.min(compact ? 26 : 42, Math.round(w * (compact ? 0.075 : 0.055))));
+      const fontPlace = Math.max(compact ? 11 : 16, Math.round(w * (compact ? 0.038 : 0.028)));
+      const fontTime = Math.max(compact ? 10 : 14, Math.round(w * (compact ? 0.034 : 0.024)));
+      const gap = Math.max(6, Math.round(avR * 0.35));
+      const placeText = place ? `📍 ${place}` : "";
+      const timeText = time ? `🕒 ${time}` : "";
+
+      ctx.save();
+      ctx.font = `700 ${fontPlace}px "Noto Sans SC", sans-serif`;
+      const placeW = placeText ? ctx.measureText(placeText).width : 0;
+      ctx.font = `600 ${fontTime}px "Noto Sans SC", sans-serif`;
+      const timeW = timeText ? ctx.measureText(timeText).width : 0;
+      const textW = Math.max(placeW, timeW);
+      const textH = (placeText ? fontPlace : 0) + (placeText && timeText ? 4 : 0) + (timeText ? fontTime : 0);
+      const boxH = Math.max(avR * 2, textH) + pad;
+      const boxW = Math.min(
+        w - pad * 2,
+        avR * 2 + gap + textW + pad * 1.6
+      );
+      const boxX = x + pad;
+      const boxY = anchor === "top" ? y + pad : y + h - pad - boxH;
+
+      ctx.fillStyle = "rgba(0,0,0,0.52)";
+      ctx.strokeStyle = "rgba(255,255,255,0.22)";
+      ctx.lineWidth = 1;
+      roundRect(ctx, boxX, boxY, boxW, boxH, Math.min(boxH / 2, 18));
+      ctx.fill();
+      ctx.stroke();
+
+      const ax = boxX + pad * 0.55 + avR;
+      const ay = boxY + boxH / 2;
+
+      ctx.save();
+      ctx.beginPath();
+      ctx.arc(ax, ay, avR, 0, Math.PI * 2);
+      ctx.closePath();
+      ctx.clip();
+      if (avatarImg) {
+        const s = Math.max((avR * 2) / avatarImg.width, (avR * 2) / avatarImg.height);
+        const dw = avatarImg.width * s;
+        const dh = avatarImg.height * s;
+        ctx.drawImage(avatarImg, ax - dw / 2, ay - dh / 2, dw, dh);
+      } else {
+        ctx.fillStyle = "#1a2838";
+        ctx.fillRect(ax - avR, ay - avR, avR * 2, avR * 2);
+        ctx.fillStyle = "#7ae7ff";
+        ctx.font = `${Math.round(avR * 1.15)}px sans-serif`;
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        ctx.fillText("🕵️", ax, ay + 1);
+      }
+      ctx.restore();
+
+      ctx.strokeStyle = "#f0c14b";
+      ctx.lineWidth = Math.max(2, Math.round(avR * 0.12));
+      ctx.beginPath();
+      ctx.arc(ax, ay, avR, 0, Math.PI * 2);
+      ctx.stroke();
+
+      const tx = ax + avR + gap;
+      let ty = ay - textH / 2;
+      ctx.textAlign = "left";
+      ctx.textBaseline = "top";
+      if (placeText) {
+        ctx.fillStyle = "#7ae7ff";
+        ctx.font = `700 ${fontPlace}px "Noto Sans SC", sans-serif`;
+        const clipped = placeText.length > 18 ? `${placeText.slice(0, 17)}…` : placeText;
+        ctx.fillText(clipped, tx, ty);
+        ty += fontPlace + 4;
+      }
+      if (timeText) {
+        ctx.fillStyle = "rgba(255,255,255,0.95)";
+        ctx.font = `600 ${fontTime}px "Noto Sans SC", sans-serif`;
+        ctx.fillText(timeText, tx, ty);
+      }
+      ctx.textBaseline = "alphabetic";
+      ctx.restore();
+    }
+
+    function triggerDownload(dataUrl, filename) {
+      const a = document.createElement("a");
+      a.download = filename;
+      a.href = dataUrl;
+      a.click();
+    }
+
+    async function buildWatermarkedPhotoDataUrl(taskId) {
+      const t = TASKS.find((x) => x.id === taskId);
+      const src = state.photos[taskId];
+      if (!t || !src) return null;
+      const photoImg = await loadImage(src);
+      if (!photoImg) return null;
+      const avatarImg = await loadImage(state.avatar);
+      const time = formatPhotoTime(state.photoTimes && state.photoTimes[taskId]);
+      const maxSide = 1600;
+      const scale = Math.min(1, maxSide / Math.max(photoImg.width, photoImg.height));
+      const w = Math.round(photoImg.width * scale);
+      const h = Math.round(photoImg.height * scale);
+      const canvas = document.createElement("canvas");
+      canvas.width = w;
+      canvas.height = h;
+      const ctx = canvas.getContext("2d");
+      ctx.drawImage(photoImg, 0, 0, w, h);
+      drawCheckinWatermark(ctx, {
+        x: 0, y: 0, w, h,
+        avatarImg,
+        place: t.place,
+        time,
+        compact: false,
+      });
+      return canvas.toDataURL("image/jpeg", 0.92);
+    }
+
+    async function downloadWatermarkedPhoto(taskId) {
+      const t = TASKS.find((x) => x.id === taskId);
+      if (!t || !state.photos[taskId]) {
+        alert("这张打卡照还没有呢～");
+        return;
+      }
+      const btn = document.getElementById("photoViewDownloadBtn");
+      if (btn) {
+        btn.disabled = true;
+        btn.textContent = "生成中…";
+      }
+      try {
+        const dataUrl = await buildWatermarkedPhotoDataUrl(taskId);
+        if (!dataUrl) throw new Error("build failed");
+        const safeName = (state.nickname || "时空小特工").replace(/[\\/:*?"<>|]/g, "_");
+        const shortTitle = t.title.replace(/^任务[一二三四五六七八]：/, "").replace(/[\\/:*?"<>|]/g, "_");
+        triggerDownload(dataUrl, `${currentLoc.name}_${shortTitle}_${safeName}.jpg`);
+        playBeep(880, 0.08);
+      } catch (err) {
+        console.error(err);
+        alert("下载失败，请再试一次～");
+      } finally {
+        if (btn) {
+          btn.disabled = false;
+          btn.textContent = "📥 下载打卡照";
+        }
+      }
+    }
+
     function drawCover(ctx, img, x, y, w, h, r = 12) {
       ctx.save();
       roundRect(ctx, x, y, w, h, r);
@@ -3980,7 +4214,7 @@
         btn.textContent = "生成中…";
       }
       if (status) {
-        status.textContent = "正在生成图片，请稍候…";
+        status.textContent = "正在生成带水印的打卡相册，请稍候…";
         status.classList.add("show");
       }
 
@@ -4154,6 +4388,14 @@
             const dw = img.width * s;
             const dh = img.height * s;
             ctx.drawImage(img, x + (colW - dw) / 2, y + (photoH - dh) / 2, dw, dh);
+            drawCheckinWatermark(ctx, {
+              x, y, w: colW, h: photoH,
+              avatarImg,
+              place: t.place,
+              time: card.photoTime,
+              compact: true,
+              anchor: "top",
+            });
           } else {
             ctx.fillStyle = "#0a121c";
             ctx.fillRect(x, y, colW, photoH);
@@ -4163,40 +4405,14 @@
             ctx.fillText("📷 暂无照片", x + colW / 2, y + photoH / 2);
             ctx.textAlign = "left";
           }
-          if (img && card.photoTime) {
-            ctx.font = "700 13px 'Noto Sans SC', sans-serif";
-            const stamp = card.photoTime;
-            const tw = ctx.measureText(stamp).width;
-            const sp = 7;
-            const bx = x + colW - tw - sp * 2 - 10;
-            const by = y + 10;
-            const bw = tw + sp * 2;
-            const bh = 22;
-            ctx.fillStyle = "rgba(0,0,0,0.5)";
-            ctx.strokeStyle = "rgba(255,255,255,0.22)";
-            ctx.lineWidth = 1;
-            roundRect(ctx, bx, by, bw, bh, 6);
-            ctx.fill();
-            ctx.stroke();
-            ctx.fillStyle = "rgba(255,255,255,0.95)";
-            ctx.textAlign = "left";
-            ctx.textBaseline = "middle";
-            ctx.fillText(stamp, bx + sp, by + bh / 2 + 0.5);
-            ctx.textBaseline = "alphabetic";
-          }
-          const g = ctx.createLinearGradient(0, y + photoH - 72, 0, y + photoH);
+          const g = ctx.createLinearGradient(0, y + photoH - 56, 0, y + photoH);
           g.addColorStop(0, "rgba(4,10,18,0)");
-          g.addColorStop(1, "rgba(4,10,18,0.9)");
+          g.addColorStop(1, "rgba(4,10,18,0.88)");
           ctx.fillStyle = g;
-          ctx.fillRect(x, y + photoH - 72, colW, 72);
+          ctx.fillRect(x, y + photoH - 56, colW, 56);
           ctx.fillStyle = "#fff";
           ctx.font = "700 20px 'Noto Sans SC', sans-serif";
-          ctx.fillText(`${t.icon} ${shortTitle}`, x + 12, y + photoH - 30);
-          ctx.fillStyle = "#7ae7ff";
-          ctx.font = "500 15px 'Noto Sans SC', sans-serif";
-          const place = `📍 ${t.place}`;
-          const placeClip = place.length > 16 ? `${place.slice(0, 15)}…` : place;
-          ctx.fillText(placeClip, x + 12, y + photoH - 10);
+          ctx.fillText(`${t.icon} ${shortTitle}`, x + 12, y + photoH - 18);
           ctx.restore();
 
           let ty = y + photoH + 20;
@@ -4229,14 +4445,11 @@
         ctx.fillText(`—— ${currentLoc.name}时空特工系统`, cx, cy + 78);
         ctx.textAlign = "left";
 
-        const a = document.createElement("a");
         const safeName = (state.nickname || "时空小特工").replace(/[\\/:*?"<>|]/g, "_");
-        a.download = `${currentLoc.name}特工报告_${safeName}.png`;
-        a.href = canvas.toDataURL("image/png");
-        a.click();
+        triggerDownload(canvas.toDataURL("image/png"), `${currentLoc.name}特工打卡相册_${safeName}.png`);
 
         if (status) {
-          status.textContent = "已保存图片，请到相册 / 下载文件夹查看～";
+          status.textContent = "相册已下载（含时间·地点·头像水印）～";
           setTimeout(() => status.classList.remove("show"), 2800);
         }
         playBeep(880, 0.08);
@@ -4247,7 +4460,7 @@
       } finally {
         if (btn) {
           btn.disabled = false;
-          btn.textContent = "🖼️ 保存为图片";
+          btn.textContent = "📥 下载打卡相册";
         }
       }
     }
@@ -4342,6 +4555,14 @@
 
     document.getElementById("photoViewClose")?.addEventListener("click", () => {
       closeOverlay("photoViewOverlay");
+    });
+
+    document.getElementById("photoViewCloseBtn")?.addEventListener("click", () => {
+      closeOverlay("photoViewOverlay");
+    });
+
+    document.getElementById("photoViewDownloadBtn")?.addEventListener("click", () => {
+      if (viewingPhotoTaskId != null) downloadWatermarkedPhoto(viewingPhotoTaskId);
     });
 
     document.getElementById("reportBtn").addEventListener("click", () => openReport());
