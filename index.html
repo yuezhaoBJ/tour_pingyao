@@ -767,7 +767,8 @@
       white-space: nowrap;
     }
     .btn-primary:hover { transform: scale(1.03); filter: brightness(1.08); }
-    .btn-primary:disabled {
+    .btn-primary:disabled,
+    .btn-primary.is-disabled {
       opacity: 0.45;
       cursor: not-allowed;
       transform: none;
@@ -3218,17 +3219,23 @@
     function updateCompleteBtn(id) {
       const btn = document.getElementById("completeBtn");
       if (!btn) return;
+      // 不用 native disabled，否则点不到；用 aria + 样式模拟不可用
+      btn.removeAttribute("disabled");
       if (state.done[id]) {
-        btn.disabled = true;
+        btn.setAttribute("aria-disabled", "true");
+        btn.classList.add("is-disabled");
         btn.textContent = "✓ 已完成";
       } else if (canComplete(id)) {
-        btn.disabled = false;
+        btn.setAttribute("aria-disabled", "false");
+        btn.classList.remove("is-disabled");
         btn.textContent = "完成任务 ✓";
       } else if (state.challengeOk[id] && !state.photos[id]) {
-        btn.disabled = true;
+        btn.setAttribute("aria-disabled", "true");
+        btn.classList.add("is-disabled");
         btn.textContent = "先拍照打卡";
       } else {
-        btn.disabled = true;
+        btn.setAttribute("aria-disabled", "true");
+        btn.classList.add("is-disabled");
         btn.textContent = "完成任务 ✓";
       }
     }
@@ -3889,10 +3896,9 @@
     }
 
     function completeTask(id) {
-      if (!state.challengeOk[id]) return;
-      if (!state.photos[id]) {
-        showFeedback(false, "还没拍照打卡哦，先拍一张再完成任务～");
-        document.getElementById("photoBox")?.scrollIntoView({ behavior: "smooth", block: "center" });
+      if (state.done[id]) return;
+      if (!state.challengeOk[id] || !state.photos[id]) {
+        showFeedback(false, "请先完成作答");
         return;
       }
       const already = !!state.done[id];

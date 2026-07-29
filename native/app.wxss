@@ -1,0 +1,72 @@
+page {
+  --bg: #0a121c;
+  --cyan: #3dd5ff;
+  --cyan-dim: rgba(61, 213, 255, 0.16);
+  --gold: #f0c14b;
+  --text: #e8eef5;
+  --muted: rgba(232, 238, 245, 0.62);
+  background: linear-gradient(165deg, #0c1624 0%, #101a28 50%, #0a1018 100%);
+  color: var(--text);
+  font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Helvetica Neue",
+    sans-serif;
+  min-height: 100%;
+  box-sizing: border-box;
+}
+
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 18rpx 36rpx;
+  border-radius: 999rpx;
+  background: linear-gradient(135deg, #2ecfff, #1aa3d6);
+  color: #041018;
+  font-weight: 800;
+  font-size: 28rpx;
+  border: none;
+}
+
+.btn-primary[disabled] {
+  opacity: 0.45;
+}
+
+.btn-primary.is-disabled {
+  opacity: 0.45;
+}
+
+.btn-ghost {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 18rpx 32rpx;
+  border-radius: 999rpx;
+  background: rgba(61, 213, 255, 0.1);
+  color: #7ae7ff;
+  border: 1rpx solid rgba(61, 213, 255, 0.4);
+  font-weight: 700;
+  font-size: 28rpx;
+}
+
+.card {
+  background: rgba(8, 14, 24, 0.72);
+  border: 1rpx solid rgba(61, 213, 255, 0.28);
+  border-radius: 24rpx;
+  box-shadow: 0 12rpx 40rpx rgba(0, 0, 0, 0.35);
+}
+
+.chip {
+  display: inline-block;
+  padding: 6rpx 16rpx;
+  border-radius: 999rpx;
+  font-size: 22rpx;
+  font-weight: 700;
+  background: rgba(61, 213, 255, 0.12);
+  color: #7ae7ff;
+  border: 1rpx solid rgba(61, 213, 255, 0.35);
+}
+
+.chip.gold {
+  background: rgba(240, 193, 75, 0.14);
+  color: #f0c14b;
+  border-color: rgba(240, 193, 75, 0.45);
+}

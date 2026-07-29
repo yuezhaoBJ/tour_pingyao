@@ -1,0 +1,11 @@
+{
+  "description": "本地私有配置",
+  "projectname": "shanxi-agent-native",
+  "libVersion": "3.3.4",
+  "setting": {
+    "compileHotReLoad": true,
+    "urlCheck": false,
+    "useMultiFrameRuntime": false,
+    "minified": false
+  }
+}

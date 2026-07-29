@@ -1,0 +1,96 @@
+<view class="page" wx:if="{{task}}">
+  <image wx:if="{{task.cover}}" class="hero" src="{{task.cover}}" mode="aspectFill" />
+
+  <view class="card block">
+    <view class="title">{{task.icon}} {{shortTitle}}</view>
+    <view class="place">📍 {{task.place}}</view>
+  </view>
+
+  <view class="card block">
+    <view class="h">🎯 任务内容</view>
+    <view class="p">{{task.content}}</view>
+  </view>
+
+  <view class="card block knowledge">
+    <view class="h">📚 知识点</view>
+    <view class="p">{{task.knowledge}}</view>
+  </view>
+
+  <!-- STEP 1 热身 -->
+  <view class="card block" wx:if="{{!warmed}}">
+    <view class="step">STEP 1 · 热身</view>
+    <view class="h">{{warmupTitle}}</view>
+    <view class="p" wx:if="{{warmupHint}}">{{warmupHint}}</view>
+
+    <view wx:if="{{warmupType === 'choice'}}" class="choices">
+      <button
+        wx:for="{{warmupChoices}}"
+        wx:key="label"
+        class="choice"
+        data-ok="{{item.ok}}"
+        bindtap="onWarmChoice"
+      >{{item.label}}</button>
+    </view>
+
+    <view wx:elif="{{warmupType === 'text'}}" class="text-warm">
+      <textarea
+        class="textarea"
+        maxlength="120"
+        placeholder="{{warmupPlaceholder}}"
+        value="{{warmText}}"
+        bindinput="onWarmText"
+      />
+      <button class="btn-primary" bindtap="submitWarmText">提交热身</button>
+    </view>
+
+    <view wx:else class="text-warm">
+      <view class="p">先读完知识点，点下面开始问答挑战。</view>
+      <button class="btn-primary" bindtap="skipWarm">开始挑战 ✓</button>
+    </view>
+
+    <view wx:if="{{warmFeedback}}" class="{{warmFbCls}}">{{warmFeedback}}</view>
+  </view>
+
+  <!-- STEP 2 问答 -->
+  <view class="card block" wx:if="{{warmed && !challenged}}">
+    <view class="step">STEP 2 · 问答 {{quizIdx + 1}} / {{quizzes.length}}</view>
+    <view class="h">{{currentQuiz.q}}</view>
+    <view class="choices">
+      <button
+        wx:for="{{currentQuiz.options}}"
+        wx:for-item="opt"
+        wx:for-index="oi"
+        wx:key="*this"
+        class="choice"
+        data-i="{{oi}}"
+        bindtap="onQuiz"
+      >{{opt}}</button>
+    </view>
+    <view wx:if="{{quizFeedback}}" class="{{quizFbCls}}">{{quizFeedback}}</view>
+  </view>
+
+  <!-- STEP 3 拍照 -->
+  <view class="card block" wx:if="{{challenged}}">
+    <view class="step">STEP 3 · 拍照打卡</view>
+    <view class="h">📷 {{photoTitle}}</view>
+    <view class="p"><text class="em">⭐ 实地挑战：</text>{{challengeText}}</view>
+    <view class="p muted">{{photoHint}}</view>
+
+    <view class="photo-actions">
+      <button class="btn-primary" bindtap="takePhoto">📸 现场拍照</button>
+      <button wx:if="{{photo}}" class="btn-ghost" bindtap="clearPhoto">重拍</button>
+    </view>
+
+    <view wx:if="{{photo}}" class="preview">
+      <image src="{{photo}}" mode="widthFix" />
+      <view class="stamp">时空特工 · 已打卡</view>
+    </view>
+  </view>
+
+  <view class="actions">
+    <button class="btn-ghost" bindtap="goBack">返回</button>
+    <button class="btn-primary {{canFinish || done ? '' : 'is-disabled'}}" bindtap="complete">
+      {{done ? '✓ 已完成' : '完成任务 ✓'}}
+    </button>
+  </view>
+</view>

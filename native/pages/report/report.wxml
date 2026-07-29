@@ -1,0 +1,50 @@
+<view class="page">
+  <view class="hero card">
+    <image class="avatar" src="{{avatar}}" mode="aspectFill" />
+    <view class="name">{{nickname}}</view>
+    <view class="chips">
+      <text class="chip gold">{{role}}</text>
+      <text class="chip">{{locName}}</text>
+      <text class="chip">📷 {{photoN}} 张</text>
+    </view>
+    <view class="sub">{{reportLabel}} · {{dateText}}</view>
+  </view>
+
+  <view class="gallery">
+    <view
+      wx:for="{{entries}}"
+      wx:key="id"
+      class="entry card"
+    >
+      <view class="stage" data-id="{{item.id}}" bindtap="preview">
+        <image wx:if="{{item.photo}}" src="{{item.photo}}" mode="aspectFill" />
+        <view wx:else class="empty">暂无照片</view>
+        <view wx:if="{{item.photo}}" class="wm">
+          <image class="wm-av" src="{{avatar}}" mode="aspectFill" />
+          <view class="wm-lines">
+            <view class="wm-title">{{item.icon}} {{item.shortTitle}}</view>
+            <view class="wm-place">📍 {{item.place}}</view>
+            <view wx:if="{{item.time}}" class="wm-time">🕒 {{item.time}}</view>
+          </view>
+        </view>
+      </view>
+      <view class="body">{{item.caption}}</view>
+      <button
+        wx:if="{{item.photo}}"
+        class="btn-ghost save-one"
+        data-id="{{item.id}}"
+        bindtap="saveOne"
+      >📥 保存这张</button>
+    </view>
+  </view>
+
+  <view class="foot card">
+    <view class="reward">{{rewardTitle}}</view>
+    <view class="msg">以镜头记录旅途，把这份相册讲给爸爸妈妈听吧！</view>
+  </view>
+
+  <view class="actions">
+    <button class="btn-ghost" bindtap="goBack">关闭</button>
+    <button class="btn-primary" bindtap="saveAll" loading="{{saving}}">📦 批量保存全部</button>
+  </view>
+</view>

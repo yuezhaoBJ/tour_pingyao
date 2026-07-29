@@ -1,0 +1,59 @@
+<view class="page">
+  <view class="agent card" bindtap="changeAvatar">
+    <image class="agent-avatar" src="{{avatar}}" mode="aspectFill" />
+    <view class="agent-meta">
+      <view class="name">{{nickname}}</view>
+      <view class="role">{{roleText}}</view>
+    </view>
+    <view class="change">换照片</view>
+  </view>
+
+  <scroll-view class="spots" scroll-x show-scrollbar="{{false}}">
+    <view
+      wx:for="{{spots}}"
+      wx:key="id"
+      class="{{item.cls}}"
+      data-id="{{item.id}}"
+      bindtap="onSpot"
+    >
+      <text class="e">{{item.emoji}}</text>
+      <text>{{item.name}}</text>
+    </view>
+  </scroll-view>
+
+  <view class="head">
+    <view class="h1">{{locTitle}}</view>
+    <view class="desc">{{locDesc}}</view>
+    <view class="progress">
+      <view class="bar"><view class="fill" style="width: {{progressPct}}%;"></view></view>
+      <view class="prog-text">{{doneN}} / {{totalN}} · 打卡 {{photoN}} 张</view>
+    </view>
+  </view>
+
+  <view class="grid">
+    <view
+      wx:for="{{cards}}"
+      wx:key="id"
+      class="{{item.cls}}"
+      data-id="{{item.id}}"
+      bindtap="openTask"
+    >
+      <view class="top">
+        <text class="icon">{{item.icon}}</text>
+        <view>
+          <view class="num">{{item.mission}}</view>
+          <view class="t">{{item.shortTitle}}</view>
+        </view>
+      </view>
+      <image class="cover" src="{{item.thumb}}" mode="aspectFill" />
+      <view class="short">{{item.short}}</view>
+      <view wx:if="{{item.done}}" class="check">✓</view>
+      <view wx:if="{{item.hasPhoto}}" class="badge">已打卡</view>
+    </view>
+  </view>
+
+  <view class="footer">
+    <button wx:if="{{allDone}}" class="btn-primary" bindtap="openReport">📄 生成任务报告</button>
+    <view wx:else class="tip">完成全部任务后可生成打卡报告</view>
+  </view>
+</view>

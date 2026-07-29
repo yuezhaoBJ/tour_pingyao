@@ -1,0 +1,17 @@
+{
+  "pages": [
+    "pages/welcome/welcome",
+    "pages/index/index",
+    "pages/task/task",
+    "pages/report/report"
+  ],
+  "window": {
+    "navigationBarTitleText": "山西时空特工",
+    "navigationBarBackgroundColor": "#0a121c",
+    "navigationBarTextStyle": "white",
+    "backgroundColor": "#0a121c",
+    "backgroundTextStyle": "light"
+  },
+  "style": "v2",
+  "sitemapLocation": "sitemap.json"
+}
