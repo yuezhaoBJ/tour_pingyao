@@ -17,12 +17,38 @@ Page({
 
   onShow: function () {
     var app = getApp();
-    var state = app.getState();
+    var state = {};
+    try {
+      state = app.getState() || {};
+    } catch (e) {
+      console.warn("index onShow", e);
+    }
+
+    // 刚从报到页进来：以内存标记为准，避免存盘失败又打回报到页
+    if (app.globalData.entryReady) {
+      app.globalData.entryReady = false;
+      state.welcomed = true;
+      state.nickname = state.nickname || (app.globalData.state && app.globalData.state.nickname) || "";
+      state.avatar = state.avatar || (app.globalData.state && app.globalData.state.avatar) || "";
+      app.globalData.state = state;
+    }
+
     if (!(state.welcomed && state.nickname && state.avatar)) {
-      app.go("/pages/welcome/welcome", "reLaunch");
+      app.globalData._forceWelcome = true;
+      wx.redirectTo({ url: "/pages/welcome/welcome" });
       return;
     }
-    this.refresh();
+
+    try {
+      this.refresh();
+    } catch (e2) {
+      console.error("index refresh", e2);
+      wx.showModal({
+        title: "清单加载失败",
+        content: String((e2 && e2.message) || e2 || "未知错误"),
+        showCancel: false,
+      });
+    }
   },
 
   refresh: function () {
@@ -76,6 +102,7 @@ Page({
       photoN: photoN,
       progressPct: totalN ? Math.round((doneN / totalN) * 100) : 0,
       allDone: doneN >= totalN && totalN > 0,
+      canReport: doneN > 0,
     });
     wx.setNavigationBarTitle({ title: loc.name || "任务清单" });
   },
@@ -94,6 +121,22 @@ Page({
 
   openReport: function () {
     wx.navigateTo({ url: "/pages/report/report" });
+  },
+
+  clearCache: function () {
+    wx.showModal({
+      title: "清空缓存？",
+      content: "将删除特工代号、照片、任务进度和打卡照片，并重新进入报到页。",
+      confirmText: "清空",
+      confirmColor: "#e85d4c",
+      success: function (res) {
+        if (!res.confirm) return;
+        wx.showToast({ title: "已清空", icon: "none", duration: 800 });
+        setTimeout(function () {
+          getApp().clearAndRestart();
+        }, 200);
+      },
+    });
   },
 
   changeAvatar: function () {

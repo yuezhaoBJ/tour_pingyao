@@ -45,6 +45,15 @@
 
   <view class="actions">
     <button class="btn-ghost" bindtap="goBack">关闭</button>
-    <button class="btn-primary" bindtap="saveAll" loading="{{saving}}">📦 批量保存全部</button>
+    <button class="btn-ghost" bindtap="saveAll" loading="{{saving}}" disabled="{{exporting}}">📦 批量保存全部</button>
   </view>
+  <view class="actions primary-row">
+    <button
+      class="btn-primary"
+      bindtap="exportCollage"
+      loading="{{exporting}}"
+      disabled="{{saving}}"
+    >📥 生成打卡报告</button>
+  </view>
+  <view wx:if="{{exportStatus}}" class="export-status">{{exportStatus}}</view>
 </view>

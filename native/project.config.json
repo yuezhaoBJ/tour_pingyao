@@ -3,53 +3,79 @@
   "packOptions": {
     "ignore": [
       {
-        "type": "folder",
-        "value": "_src"
+        "value": "_src",
+        "type": "folder"
       },
       {
-        "type": "file",
-        "value": "README.md"
+        "value": "miniapp",
+        "type": "folder"
       },
       {
-        "type": "file",
-        "value": "sync-from-h5.sh"
+        "value": "i18n",
+        "type": "folder"
       },
       {
-        "type": "file",
-        "value": ".DS_Store"
+        "value": "README.md",
+        "type": "file"
+      },
+      {
+        "value": "sync-from-h5.sh",
+        "type": "file"
+      },
+      {
+        "value": ".DS_Store",
+        "type": "file"
+      },
+      {
+        "value": "app.miniapp.json",
+        "type": "file"
+      },
+      {
+        "value": "project.miniapp.json",
+        "type": "file"
+      },
+      {
+        "value": "project.private.config.json",
+        "type": "file"
       }
-    ]
+    ],
+    "include": []
   },
   "setting": {
     "urlCheck": false,
     "es6": true,
     "enhance": true,
     "postcss": true,
-    "minified": false,
-    "newFeature": true,
-    "coverView": true,
-    "nodeModules": false,
-    "autoAudits": false,
-    "uglifyFileName": false,
-    "checkInvalidKey": true,
-    "checkSiteMap": true,
-    "uploadWithSourceMap": true,
-    "compileHotReLoad": false,
+    "minified": true,
+    "minifyWXSS": true,
+    "minifyWXML": true,
+    "compileHotReLoad": true,
     "useMultiFrameRuntime": false,
-    "useApiHook": true,
+    "ignoreDevUnusedFiles": false,
+    "bigPackageSizeSupport": true,
     "babelSetting": {
       "ignore": [],
       "disablePlugins": [],
       "outputPath": ""
-    }
+    },
+    "compileWorklet": false,
+    "uglifyFileName": false,
+    "uploadWithSourceMap": true,
+    "packNpmManually": false,
+    "packNpmRelationList": [],
+    "localPlugins": false,
+    "disableUseStrict": false,
+    "useCompilerPlugins": false,
+    "condition": false
   },
   "compileType": "miniprogram",
   "libVersion": "2.33.0",
-  "appid": "touristappid",
+  "appid": "wx56708985162b43f3",
   "projectname": "shanxi-agent-native",
   "condition": {},
   "editorSetting": {
     "tabIndent": "insertSpaces",
     "tabSize": 2
-  }
+  },
+  "simulatorPluginLibVersion": {}
 }

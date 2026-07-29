@@ -13,16 +13,21 @@
       placeholder="例如：小龟城、阿晋"
       value="{{nickname}}"
       bindinput="onNick"
+      bindblur="onNick"
+      confirm-type="done"
     />
 
     <view class="label">特工照片</view>
     <view class="avatar-row">
       <image wx:if="{{avatar}}" class="avatar" src="{{avatar}}" mode="aspectFill" />
       <view wx:else class="avatar placeholder">🕵️</view>
-      <button class="btn-photo" bindtap="chooseAvatar">📷 拍照 / 选图</button>
+      <view class="btn-photo" bindtap="chooseAvatar">📷 拍照 / 选图</view>
     </view>
     <view class="hint">仅用于本机任务报告展示，可随时更换。</view>
 
-    <button class="btn-start" bindtap="start">开始任务 ✓</button>
+    <!-- 用 view 代替 button，避免真机 button 点击无响应 -->
+    <view class="btn-start" bindtap="start" hover-class="btn-start-hover">开始任务 ✓</view>
   </view>
+
+  <view class="btn-clear" bindtap="clearCache" hover-class="btn-clear-hover">清空缓存并重新进入</view>
 </view>

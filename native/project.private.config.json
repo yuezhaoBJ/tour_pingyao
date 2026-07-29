@@ -6,8 +6,24 @@
     "urlCheck": false,
     "es6": true,
     "enhance": true,
-    "compileHotReLoad": false,
+    "compileHotReLoad": true,
     "useMultiFrameRuntime": false,
-    "minified": false
-  }
+    "minified": true,
+    "minifyWXSS": true,
+    "minifyWXML": true,
+    "coverView": true,
+    "skylineRenderEnable": false,
+    "ignoreDevUnusedFiles": false,
+    "bigPackageSizeSupport": true,
+    "lazyloadPlaceholderEnable": false,
+    "preloadBackgroundData": false,
+    "autoAudits": false,
+    "useApiHook": true,
+    "showShadowRootInWxmlPanel": false,
+    "useStaticServer": false,
+    "useLanDebug": false,
+    "showES6CompileOption": false,
+    "checkInvalidKey": true
+  },
+  "condition": {}
 }

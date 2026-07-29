@@ -36,12 +36,37 @@ Page({
 
   onLoad(query) {
     const id = Number(query.id);
+    this._loaded = false;
     this.setData({ taskId: id });
     this.loadTask(id);
+    this._loaded = true;
   },
 
   onShow() {
-    if (this.data.taskId) this.loadTask(this.data.taskId);
+    // 避免与 onLoad 重复全量 setData；从相机返回时只同步照片/完成态
+    if (!this._loaded || !this.data.taskId) return;
+    this.syncProgressOnly();
+  },
+
+  syncProgressOnly: function () {
+    var app = getApp();
+    var id = this.data.taskId;
+    var state = app.getState();
+    var done = !!state.done[id];
+    var photo = state.photos[id] || "";
+    var challenged = !!state.challengeOk[id];
+    var warmed = challenged || done || !!this._sessionWarmed;
+    var canFinish = app.canComplete(id, state) || done;
+    this.setData(
+      Object.assign(
+        {
+          photo: photo,
+          challenged: challenged,
+          warmed: warmed,
+        },
+        this.syncCompleteBtn(canFinish, done)
+      )
+    );
   },
 
   syncCompleteBtn: function (canFinish, done) {
@@ -98,10 +123,17 @@ Page({
     const quizIdx = Math.min(this._quizIdx || 0, Math.max(0, quizzes.length - 1));
 
     const canFinish = getApp().canComplete(id, state) || done;
+    // 只下发展示字段，避免把整份 quizzes/knowledge 大对象反复 setData
     this.setData(
       Object.assign(
         {
-          task: task,
+          task: {
+            cover: task.cover || "",
+            icon: task.icon || "",
+            place: task.place || "",
+            content: task.content || "",
+            knowledge: task.knowledge || "",
+          },
           shortTitle: getApp().shortTitle(task.title),
           warmed: warmed,
           challenged: challenged,
@@ -267,10 +299,15 @@ Page({
               )
             );
           })
-          .catch(function () {})
+          .catch(function () {
+            wx.showToast({ title: "保存超时，请重试", icon: "none" });
+          })
           .then(function () {
             wx.hideLoading();
           });
+      },
+      fail: function () {
+        wx.showToast({ title: "无法打开相机", icon: "none" });
       },
     });
   },

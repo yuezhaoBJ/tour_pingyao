@@ -53,7 +53,8 @@
   </view>
 
   <view class="footer">
-    <button wx:if="{{allDone}}" class="btn-primary" bindtap="openReport">📄 生成任务报告</button>
-    <view wx:else class="tip">完成全部任务后可生成打卡报告</view>
+    <button wx:if="{{canReport}}" class="btn-primary" bindtap="openReport">📄 生成任务报告</button>
+    <view wx:else class="tip">至少完成 1 个任务后可生成打卡报告</view>
+    <view class="btn-clear" bindtap="clearCache" hover-class="btn-clear-hover">清空缓存并重新进入</view>
   </view>
 </view>

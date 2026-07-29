@@ -781,25 +781,68 @@ function photoCount(tasks, photos) {
 function canComplete(taskId, state) {
   return !!state.challengeOk[taskId] && !!state.photos[taskId] && !state.done[taskId];
 }
-function compressImageFile(filePath) {
+function withTimeout(promise, ms, fallback) {
   return new Promise(function (resolve) {
-    if (!wx.compressImage) { resolve(filePath); return; }
-    wx.compressImage({
-      src: filePath,
-      quality: 72,
-      success: function (res) { resolve(res.tempFilePath || filePath); },
-      fail: function () { resolve(filePath); },
-    });
+    var settled = false;
+    var timer = setTimeout(function () {
+      if (settled) return;
+      settled = true;
+      resolve(fallback);
+    }, ms || 8000);
+    promise.then(
+      function (v) {
+        if (settled) return;
+        settled = true;
+        clearTimeout(timer);
+        resolve(v);
+      },
+      function () {
+        if (settled) return;
+        settled = true;
+        clearTimeout(timer);
+        resolve(fallback);
+      }
+    );
   });
 }
+function compressImageFile(filePath) {
+  return withTimeout(
+    new Promise(function (resolve) {
+      if (!wx.compressImage) {
+        resolve(filePath);
+        return;
+      }
+      wx.compressImage({
+        src: filePath,
+        quality: 72,
+        success: function (res) {
+          resolve(res.tempFilePath || filePath);
+        },
+        fail: function () {
+          resolve(filePath);
+        },
+      });
+    }),
+    8000,
+    filePath
+  );
+}
 function saveFilePersistent(tempPath) {
-  return new Promise(function (resolve) {
-    wx.saveFile({
-      tempFilePath: tempPath,
-      success: function (res) { resolve(res.savedFilePath); },
-      fail: function () { resolve(tempPath); },
-    });
-  });
+  return withTimeout(
+    new Promise(function (resolve) {
+      wx.saveFile({
+        tempFilePath: tempPath,
+        success: function (res) {
+          resolve(res.savedFilePath);
+        },
+        fail: function () {
+          resolve(tempPath);
+        },
+      });
+    }),
+    8000,
+    tempPath
+  );
 }
 function ensureAlbumAuth() {
   return new Promise(function (resolve) {
@@ -835,24 +878,26 @@ App({
   globalData: {
     state: null,
     locations: LOCATIONS,
-    routing: false,
+    entryReady: false,
+    _forceWelcome: false,
   },
   onLaunch: function () {
     this.globalData.state = loadState();
   },
-  go: function (url, mode) {
-    var that = this;
-    if (this.globalData.routing) return;
-    this.globalData.routing = true;
-    var done = function () {
-      setTimeout(function () { that.globalData.routing = false; }, 400);
-    };
-    var opts = { url: url, complete: done, fail: function () {
-      if (mode !== "reLaunch") wx.reLaunch({ url: url, complete: done });
-      else done();
-    }};
-    if (mode === "redirect") wx.redirectTo(opts);
-    else wx.reLaunch(opts);
+  go: function (url) {
+    wx.reLaunch({
+      url: url,
+      fail: function (err) {
+        console.warn("reLaunch fail", err);
+        wx.redirectTo({
+          url: url,
+          fail: function (err2) {
+            console.warn("redirectTo fail", err2);
+            wx.navigateTo({ url: url });
+          },
+        });
+      },
+    });
   },
   getState: function () {
     if (!this.globalData.state) this.globalData.state = loadState();
@@ -865,6 +910,60 @@ App({
     this.globalData.state = state;
     saveState(state, opts);
     return state;
+  },
+  /** 清空本地进度/昵称头像等，并回到报到页 */
+  clearAndRestart: function () {
+    var that = this;
+    var fresh = {
+      nickname: "",
+      avatar: "",
+      welcomed: false,
+      locationId: "pingyao",
+      spots: {},
+      savedAt: null,
+      done: {},
+      notes: {},
+      challengeOk: {},
+      photos: {},
+      photoTimes: {},
+    };
+    try {
+      wx.removeStorageSync(STORAGE_KEY);
+    } catch (e) {}
+    try {
+      wx.clearStorageSync();
+    } catch (e2) {}
+    that.globalData.state = fresh;
+    that.globalData.entryReady = false;
+    that.globalData._forceWelcome = true;
+
+    // 尽量清掉本机已保存的打卡文件
+    try {
+      wx.getSavedFileList({
+        success: function (res) {
+          var list = (res && res.fileList) || [];
+          list.forEach(function (f) {
+            if (f && f.filePath) {
+              try {
+                wx.removeSavedFile({ filePath: f.filePath });
+              } catch (e3) {}
+            }
+          });
+        },
+      });
+    } catch (e4) {}
+
+    wx.reLaunch({
+      url: "/pages/welcome/welcome",
+      fail: function () {
+        wx.redirectTo({
+          url: "/pages/welcome/welcome",
+          fail: function () {
+            that.go("/pages/welcome/welcome");
+          },
+        });
+      },
+    });
   },
   getLocation: function () {
     var state = this.getState();
