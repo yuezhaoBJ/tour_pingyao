@@ -1,11 +1,11 @@
 <view class="page">
-  <view class="hero card">
+  <view class="hero">
     <view class="emoji">🕵️</view>
     <view class="title">时空特工报到</view>
     <view class="sub">设置代号与特工照片，开启山西探索任务</view>
   </view>
 
-  <view class="form card">
+  <view class="form">
     <view class="label">特工代号（昵称）</view>
     <input
       class="input"
@@ -19,10 +19,10 @@
     <view class="avatar-row">
       <image wx:if="{{avatar}}" class="avatar" src="{{avatar}}" mode="aspectFill" />
       <view wx:else class="avatar placeholder">🕵️</view>
-      <button class="btn-ghost" bindtap="chooseAvatar">📷 拍照 / 选图</button>
+      <button class="btn-photo" bindtap="chooseAvatar">📷 拍照 / 选图</button>
     </view>
     <view class="hint">仅用于本机任务报告展示，可随时更换。</view>
 
-    <button class="btn-primary start" bindtap="start" disabled="{{!canStart}}">开始任务 ✓</button>
+    <button class="btn-start" bindtap="start">开始任务 ✓</button>
   </view>
 </view>

@@ -4,7 +4,7 @@ const {
   doneCount,
   photoCount,
   ensureAlbumAuth,
-} = require("../../utils/util.js");
+} = require("../../utils/util");
 
 function loadImageInfo(src) {
   return new Promise((resolve) => {

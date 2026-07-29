@@ -1,32 +1,44 @@
 .page {
+  min-height: 100vh;
   padding: 40rpx 32rpx 80rpx;
+  box-sizing: border-box;
+  background: #0a121c;
+  color: #e8eef5;
 }
 
 .hero {
   padding: 48rpx 36rpx;
   text-align: center;
   margin-bottom: 28rpx;
+  background: rgba(8, 14, 24, 0.85);
+  border: 1rpx solid rgba(61, 213, 255, 0.35);
+  border-radius: 24rpx;
 }
 
 .emoji {
   font-size: 72rpx;
+  line-height: 1.2;
 }
 
 .title {
   font-size: 40rpx;
   font-weight: 800;
   margin-top: 8rpx;
+  color: #ffffff;
 }
 
 .sub {
   margin-top: 12rpx;
   font-size: 26rpx;
-  color: rgba(232, 238, 245, 0.65);
+  color: rgba(232, 238, 245, 0.75);
   line-height: 1.5;
 }
 
 .form {
   padding: 36rpx;
+  background: rgba(8, 14, 24, 0.85);
+  border: 1rpx solid rgba(61, 213, 255, 0.35);
+  border-radius: 24rpx;
 }
 
 .label {
@@ -37,18 +49,18 @@
 }
 
 .input {
-  background: rgba(0, 0, 0, 0.28);
-  border: 1rpx solid rgba(61, 213, 255, 0.35);
+  background: rgba(0, 0, 0, 0.35);
+  border: 1rpx solid rgba(61, 213, 255, 0.4);
   border-radius: 16rpx;
   padding: 20rpx 24rpx;
-  color: #fff;
+  color: #ffffff;
   margin-bottom: 28rpx;
+  font-size: 28rpx;
 }
 
 .avatar-row {
   display: flex;
   align-items: center;
-  gap: 24rpx;
   margin-bottom: 12rpx;
 }
 
@@ -57,6 +69,8 @@
   height: 120rpx;
   border-radius: 50%;
   border: 4rpx solid #f0c14b;
+  margin-right: 24rpx;
+  flex-shrink: 0;
 }
 
 .avatar.placeholder {
@@ -65,6 +79,20 @@
   justify-content: center;
   background: #1a2838;
   font-size: 48rpx;
+  color: #7ae7ff;
+}
+
+.btn-photo {
+  flex: 1;
+  margin: 0;
+  padding: 18rpx 24rpx;
+  border-radius: 999rpx;
+  background: rgba(61, 213, 255, 0.12);
+  color: #7ae7ff;
+  border: 1rpx solid rgba(61, 213, 255, 0.45);
+  font-weight: 700;
+  font-size: 26rpx;
+  line-height: 1.4;
 }
 
 .hint {
@@ -73,6 +101,15 @@
   margin-bottom: 36rpx;
 }
 
-.start {
+.btn-start {
   width: 100%;
+  margin: 0;
+  padding: 22rpx 36rpx;
+  border-radius: 999rpx;
+  background: linear-gradient(135deg, #2ecfff, #1aa3d6);
+  color: #041018;
+  font-weight: 800;
+  font-size: 30rpx;
+  border: none;
+  line-height: 1.4;
 }

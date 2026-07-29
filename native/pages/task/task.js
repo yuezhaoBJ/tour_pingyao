@@ -3,7 +3,7 @@ const {
   canComplete,
   compressImageFile,
   saveFilePersistent,
-} = require("../../utils/util.js");
+} = require("../../utils/util");
 
 Page({
   data: {
@@ -15,6 +15,8 @@ Page({
     done: false,
     photo: "",
     canFinish: false,
+    completeCls: "is-disabled",
+    completeText: "完成任务 ✓",
 
     warmupType: "skip",
     warmupTitle: "热身准备",
@@ -47,6 +49,15 @@ Page({
 
   onShow() {
     if (this.data.taskId) this.loadTask(this.data.taskId);
+  },
+
+  syncCompleteBtn: function (canFinish, done) {
+    return {
+      canFinish: !!canFinish,
+      done: !!done,
+      completeCls: canFinish || done ? "" : "is-disabled",
+      completeText: done ? "✓ 已完成" : "完成任务 ✓",
+    };
   },
 
   loadTask(id) {
@@ -93,27 +104,31 @@ Page({
     const quizzes = task.quizzes || [];
     const quizIdx = Math.min(this._quizIdx || 0, Math.max(0, quizzes.length - 1));
 
-    this.setData({
-      task,
-      shortTitle: shortTitle(task.title),
-      warmed,
-      challenged,
-      done,
-      photo,
-      canFinish: canComplete(id, state) || done,
-      warmupType,
-      warmupTitle,
-      warmupHint,
-      warmupChoices,
-      warmupPlaceholder,
-      warmMin,
-      quizzes,
-      quizIdx,
-      currentQuiz: quizzes[quizIdx] || { q: "", options: [] },
-      photoTitle: (task.photo && task.photo.title) || "打卡照",
-      photoHint: (task.photo && task.photo.hint) || "",
-      challengeText: task.challenge || "",
-    });
+    const canFinish = canComplete(id, state) || done;
+    this.setData(
+      Object.assign(
+        {
+          task: task,
+          shortTitle: shortTitle(task.title),
+          warmed: warmed,
+          challenged: challenged,
+          photo: photo,
+          warmupType: warmupType,
+          warmupTitle: warmupTitle,
+          warmupHint: warmupHint,
+          warmupChoices: warmupChoices,
+          warmupPlaceholder: warmupPlaceholder,
+          warmMin: warmMin,
+          quizzes: quizzes,
+          quizIdx: quizIdx,
+          currentQuiz: quizzes[quizIdx] || { q: "", options: [] },
+          photoTitle: (task.photo && task.photo.title) || "打卡照",
+          photoHint: (task.photo && task.photo.hint) || "",
+          challengeText: task.challenge || "",
+        },
+        this.syncCompleteBtn(canFinish, done)
+      )
+    );
 
     wx.setNavigationBarTitle({ title: shortTitle(task.title) });
   },
@@ -201,13 +216,17 @@ Page({
       const state = app.getState();
       state.challengeOk[this.data.taskId] = true;
       app.setState({ challengeOk: state.challengeOk }, { toast: true, message: "问答通关！" });
-      this.setData({
-        quizOk: true,
-        quizFeedback: "全部答对！去拍照打卡吧。",
-        quizFbCls: "fb ok",
-        challenged: true,
-        canFinish: canComplete(this.data.taskId, app.getState()),
-      });
+      this.setData(
+        Object.assign(
+          {
+            quizOk: true,
+            quizFeedback: "全部答对！去拍照打卡吧。",
+            quizFbCls: "fb ok",
+            challenged: true,
+          },
+          this.syncCompleteBtn(canComplete(this.data.taskId, app.getState()), false)
+        )
+      );
       return;
     }
 
@@ -246,10 +265,14 @@ Page({
               { photos: state.photos, photoTimes: state.photoTimes },
               { toast: true, message: "打卡照片已保存" }
             );
-            that.setData({
-              photo: saved,
-              canFinish: canComplete(that.data.taskId, app.getState()),
-            });
+            that.setData(
+              Object.assign(
+                {
+                  photo: saved,
+                },
+                that.syncCompleteBtn(canComplete(that.data.taskId, app.getState()), false)
+              )
+            );
           })
           .catch(function () {})
           .then(function () {
@@ -265,10 +288,14 @@ Page({
     delete state.photos[this.data.taskId];
     if (state.photoTimes) delete state.photoTimes[this.data.taskId];
     app.setState({ photos: state.photos, photoTimes: state.photoTimes });
-    this.setData({
-      photo: "",
-      canFinish: false,
-    });
+    this.setData(
+      Object.assign(
+        {
+          photo: "",
+        },
+        this.syncCompleteBtn(false, false)
+      )
+    );
   },
 
   complete() {
@@ -285,7 +312,7 @@ Page({
     }
     state.done[id] = true;
     app.setState({ done: state.done }, { toast: true, message: "任务完成！" });
-    this.setData({ done: true, canFinish: true });
+    this.setData(this.syncCompleteBtn(true, true));
     setTimeout(function () {
       wx.navigateBack();
     }, 600);

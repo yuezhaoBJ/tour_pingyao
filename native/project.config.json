@@ -9,34 +9,44 @@
       {
         "value": "sync-from-h5.sh",
         "type": "file"
+      },
+      {
+        "value": ".DS_Store",
+        "type": "file"
       }
-    ],
-    "include": []
+    ]
   },
   "setting": {
     "urlCheck": false,
     "es6": true,
-    "enhance": true,
+    "enhance": false,
     "postcss": true,
     "minified": false,
-    "minifyWXSS": false,
-    "minifyWXML": false,
-    "compileHotReLoad": true,
+    "newFeature": false,
     "coverView": true,
-    "useMultiFrameRuntime": false,
-    "useApiHook": true,
-    "useApiHostProcess": true,
-    "useIsolateContext": true,
     "nodeModules": false,
+    "autoAudits": false,
     "showShadowRootInWxmlPanel": true,
+    "scopeDataCheck": false,
+    "uglifyFileName": false,
+    "checkInvalidKey": true,
+    "checkSiteMap": true,
+    "uploadWithSourceMap": true,
+    "compileHotReLoad": false,
+    "lazyloadPlaceholderEnable": false,
+    "useMultiFrameRuntime": false,
+    "useApiHook": false,
+    "useApiHostProcess": false,
     "babelSetting": {
       "ignore": [],
       "disablePlugins": [],
       "outputPath": ""
-    }
+    },
+    "condition": false,
+    "compileWorklet": false
   },
   "compileType": "miniprogram",
-  "libVersion": "3.3.4",
+  "libVersion": "2.33.0",
   "appid": "touristappid",
   "projectname": "shanxi-agent-native",
   "condition": {},

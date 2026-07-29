@@ -7,14 +7,14 @@ function shortTitle(title) {
 }
 
 function formatPhotoTime(ts) {
-  const n = Number(ts);
+  var n = Number(ts);
   if (!n || !isFinite(n)) return "";
-  const d = new Date(n);
+  var d = new Date(n);
   if (isNaN(d.getTime())) return "";
-  const pad = function (v) {
-    const s = String(v);
+  function pad(v) {
+    var s = String(v);
     return s.length < 2 ? "0" + s : s;
-  };
+  }
   return (
     d.getFullYear() +
     "年" +
@@ -29,38 +29,54 @@ function formatPhotoTime(ts) {
 }
 
 function doneCount(tasks, doneMap) {
-  return tasks.filter((t) => doneMap[t.id]).length;
+  var n = 0;
+  var i;
+  for (i = 0; i < tasks.length; i++) {
+    if (doneMap[tasks[i].id]) n++;
+  }
+  return n;
 }
 
 function photoCount(tasks, photos) {
-  return tasks.filter((t) => photos[t.id]).length;
+  var n = 0;
+  var i;
+  for (i = 0; i < tasks.length; i++) {
+    if (photos[tasks[i].id]) n++;
+  }
+  return n;
 }
 
 function canComplete(taskId, state) {
   return !!state.challengeOk[taskId] && !!state.photos[taskId] && !state.done[taskId];
 }
 
-/** 压缩本地图片为较小临时文件，返回临时路径 */
 function compressImageFile(filePath) {
-  return new Promise((resolve, reject) => {
+  return new Promise(function (resolve) {
+    if (!wx.compressImage) {
+      resolve(filePath);
+      return;
+    }
     wx.compressImage({
       src: filePath,
       quality: 72,
-      success: (res) => resolve(res.tempFilePath || filePath),
-      fail: () => resolve(filePath),
+      success: function (res) {
+        resolve(res.tempFilePath || filePath);
+      },
+      fail: function () {
+        resolve(filePath);
+      },
     });
   });
 }
 
-/** 把临时文件转存到用户目录，避免被清理 */
 function saveFilePersistent(tempPath) {
-  return new Promise((resolve, reject) => {
+  return new Promise(function (resolve) {
     wx.saveFile({
       tempFilePath: tempPath,
-      success: (res) => resolve(res.savedFilePath),
-      fail: (err) => {
-        // 失败则仍用临时路径
-        console.warn("saveFile failed", err);
+      success: function (res) {
+        resolve(res.savedFilePath);
+      },
+      fail: function () {
         resolve(tempPath);
       },
     });
@@ -68,26 +84,32 @@ function saveFilePersistent(tempPath) {
 }
 
 function ensureAlbumAuth() {
-  return new Promise((resolve) => {
+  return new Promise(function (resolve) {
     wx.getSetting({
-      success: (res) => {
+      success: function (res) {
         if (res.authSetting["scope.writePhotosAlbum"]) {
           resolve(true);
           return;
         }
         wx.authorize({
           scope: "scope.writePhotosAlbum",
-          success: () => resolve(true),
-          fail: () => {
+          success: function () {
+            resolve(true);
+          },
+          fail: function () {
             wx.showModal({
               title: "需要相册权限",
               content: "请允许保存图片到相册，用于下载打卡照。",
               confirmText: "去设置",
-              success: (r) => {
+              success: function (r) {
                 if (r.confirm) {
                   wx.openSetting({
-                    success: (s) => resolve(!!s.authSetting["scope.writePhotosAlbum"]),
-                    fail: () => resolve(false),
+                    success: function (s) {
+                      resolve(!!s.authSetting["scope.writePhotosAlbum"]);
+                    },
+                    fail: function () {
+                      resolve(false);
+                    },
                   });
                 } else resolve(false);
               },
@@ -95,19 +117,21 @@ function ensureAlbumAuth() {
           },
         });
       },
-      fail: () => resolve(false),
+      fail: function () {
+        resolve(false);
+      },
     });
   });
 }
 
 module.exports = {
-  escapeText,
-  shortTitle,
-  formatPhotoTime,
-  doneCount,
-  photoCount,
-  canComplete,
-  compressImageFile,
-  saveFilePersistent,
-  ensureAlbumAuth,
+  escapeText: escapeText,
+  shortTitle: shortTitle,
+  formatPhotoTime: formatPhotoTime,
+  doneCount: doneCount,
+  photoCount: photoCount,
+  canComplete: canComplete,
+  compressImageFile: compressImageFile,
+  saveFilePersistent: saveFilePersistent,
+  ensureAlbumAuth: ensureAlbumAuth,
 };

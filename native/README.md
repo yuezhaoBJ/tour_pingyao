@@ -60,6 +60,21 @@ native/                         ← 用开发者工具打开这一层（不要�
 
 > 注意：`app.json` 的 `requiredPrivateInfos` **只能**填写地理位置类接口（如 `getLocation`）。本小程序不用定位，因此**不要**把 `chooseMedia` / `saveImageToPhotosAlbum` 写进该字段，否则会报错 `-80422`。
 
+### 若扫码预览「特工报到」空白
+
+常见原因：增强编译 / 工程目录开错，导致渲染层崩溃（只有标题栏、内容区空白）。
+
+请按顺序操作：
+
+1. **关闭**当前项目  
+2. **重新导入**目录：`tour_pingyao/native`（必须能看到同级的 `app.js` + `project.config.json`）  
+3. **工具 → 清除缓存 → 全部清除**  
+4. 详情 → 本地设置：关闭「增强编译」「多线程/多帧运行时」  
+5. 模拟器基础库选 **2.33.0**（或与 `project.config.json` 一致）  
+6. 再点 **编译**，确认模拟器报到页有表单后，再重新生成预览二维码  
+
+> 工程已默认关闭 `enhance`；报到页不再依赖 `require`，避免模块加载失败时整页空白。
+
 ## 本地开发提示
 
 若模拟器出现 **`Unexpected token .` / `wx is not defined` / `enableUpdateWxAppCode`**：

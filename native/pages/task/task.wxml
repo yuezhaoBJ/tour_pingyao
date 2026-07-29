@@ -89,8 +89,8 @@
 
   <view class="actions">
     <button class="btn-ghost" bindtap="goBack">返回</button>
-    <button class="btn-primary {{canFinish || done ? '' : 'is-disabled'}}" bindtap="complete">
-      {{done ? '✓ 已完成' : '完成任务 ✓'}}
+    <button class="btn-primary {{completeCls}}" bindtap="complete">
+      {{completeText}}
     </button>
   </view>
 </view>

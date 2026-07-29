@@ -4,7 +4,7 @@ const {
   photoCount,
   compressImageFile,
   saveFilePersistent,
-} = require("../../utils/util.js");
+} = require("../../utils/util");
 
 Page({
   data: {
@@ -27,7 +27,11 @@ Page({
     const app = getApp();
     const state = app.getState();
     if (!(state.welcomed && state.nickname && state.avatar)) {
-      wx.reLaunch({ url: "/pages/welcome/welcome" });
+      if (typeof app.go === "function") {
+        app.go("/pages/welcome/welcome", "reLaunch");
+      } else {
+        wx.reLaunch({ url: "/pages/welcome/welcome" });
+      }
       return;
     }
     this.refresh();
