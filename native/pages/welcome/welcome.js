@@ -1,36 +1,3 @@
-function compressImageFile(filePath) {
-  return new Promise(function (resolve) {
-    if (!wx.compressImage) {
-      resolve(filePath);
-      return;
-    }
-    wx.compressImage({
-      src: filePath,
-      quality: 72,
-      success: function (res) {
-        resolve(res.tempFilePath || filePath);
-      },
-      fail: function () {
-        resolve(filePath);
-      },
-    });
-  });
-}
-
-function saveFilePersistent(tempPath) {
-  return new Promise(function (resolve) {
-    wx.saveFile({
-      tempFilePath: tempPath,
-      success: function (res) {
-        resolve(res.savedFilePath);
-      },
-      fail: function () {
-        resolve(tempPath);
-      },
-    });
-  });
-}
-
 Page({
   data: {
     nickname: "",
@@ -41,21 +8,11 @@ Page({
   onLoad: function () {
     var state = {};
     try {
-      var app = getApp();
-      if (app && typeof app.getState === "function") {
-        state = app.getState() || {};
-      }
-    } catch (e) {
-      console.warn("welcome getApp", e);
-    }
+      state = getApp().getState() || {};
+    } catch (e) {}
 
-    // 已报到：只在 onLoad 跳一次，避免与 onShow 重复 reLaunch
     if (state.welcomed && state.nickname && state.avatar) {
-      try {
-        getApp().go("/pages/index/index", "reLaunch");
-      } catch (e) {
-        wx.reLaunch({ url: "/pages/index/index" });
-      }
+      getApp().go("/pages/index/index", "reLaunch");
       return;
     }
 
@@ -79,6 +36,7 @@ Page({
   chooseAvatar: function () {
     var that = this;
     var nickname = this.data.nickname || "";
+    var app = getApp();
     wx.chooseMedia({
       count: 1,
       mediaType: ["image"],
@@ -88,9 +46,10 @@ Page({
         var file = res.tempFiles && res.tempFiles[0];
         if (!file) return;
         wx.showLoading({ title: "处理中" });
-        compressImageFile(file.tempFilePath)
+        app
+          .compressImageFile(file.tempFilePath)
           .then(function (compressed) {
-            return saveFilePersistent(compressed);
+            return app.saveFilePersistent(compressed);
           })
           .then(function (saved) {
             var current = that.data.nickname || nickname || "";
@@ -108,8 +67,7 @@ Page({
             wx.hideLoading();
           });
       },
-      fail: function (err) {
-        console.warn("chooseMedia", err);
+      fail: function () {
         wx.showToast({ title: "无法打开相机/相册", icon: "none" });
       },
     });
@@ -121,19 +79,15 @@ Page({
       wx.showToast({ title: "请填写代号并设置照片", icon: "none" });
       return;
     }
-    try {
-      var app = getApp();
-      app.setState(
-        {
-          nickname: nickname,
-          avatar: this.data.avatar,
-          welcomed: true,
-        },
-        { toast: true, message: "报到成功" }
-      );
-      app.go("/pages/index/index", "reLaunch");
-    } catch (e) {
-      wx.showToast({ title: "保存失败，请重开项目后再试", icon: "none" });
-    }
+    var app = getApp();
+    app.setState(
+      {
+        nickname: nickname,
+        avatar: this.data.avatar,
+        welcomed: true,
+      },
+      { toast: true, message: "报到成功" }
+    );
+    app.go("/pages/index/index", "reLaunch");
   },
 });

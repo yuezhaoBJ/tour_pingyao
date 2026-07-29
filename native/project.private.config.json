@@ -4,8 +4,8 @@
   "libVersion": "2.33.0",
   "setting": {
     "urlCheck": false,
-    "enhance": false,
     "es6": true,
+    "enhance": true,
     "compileHotReLoad": false,
     "useMultiFrameRuntime": false,
     "minified": false

@@ -1,11 +1,3 @@
-const {
-  shortTitle,
-  formatPhotoTime,
-  doneCount,
-  photoCount,
-  ensureAlbumAuth,
-} = require("../../utils/util");
-
 function loadImageInfo(src) {
   return new Promise((resolve) => {
     if (!src) {
@@ -43,7 +35,7 @@ Page({
     const state = app.getState();
     const loc = app.getLocation();
     const tasks = app.getTasks();
-    if (doneCount(tasks, state.done) < tasks.length) {
+    if (getApp().doneCount(tasks, state.done) < tasks.length) {
       wx.showModal({
         title: "还不能生成报告",
         content: "请先完成当前景点的全部任务。",
@@ -62,10 +54,10 @@ Page({
       return {
         id: t.id,
         icon: t.icon,
-        shortTitle: shortTitle(t.title),
+        shortTitle: getApp().shortTitle(t.title),
         place: t.place,
         photo,
-        time: formatPhotoTime(state.photoTimes && state.photoTimes[t.id]),
+        time: getApp().formatPhotoTime(state.photoTimes && state.photoTimes[t.id]),
         caption: note ? `特工手记：${note}` : story,
       };
     });
@@ -78,7 +70,7 @@ Page({
       reportLabel: loc.reportLabel,
       rewardTitle: loc.rewardTitle,
       dateText,
-      photoN: photoCount(tasks, state.photos),
+      photoN: getApp().photoCount(tasks, state.photos),
       entries,
     });
   },
@@ -134,9 +126,9 @@ Page({
       });
     }
 
-    const title = `${task.icon} ${shortTitle(task.title)}`;
+    const title = `${task.icon} ${getApp().shortTitle(task.title)}`;
     const place = task.place || "";
-    const time = formatPhotoTime(state.photoTimes && state.photoTimes[taskId]);
+    const time = getApp().formatPhotoTime(state.photoTimes && state.photoTimes[taskId]);
     const pad = Math.max(10, Math.round(w * 0.02));
     const avR = Math.max(22, Math.min(42, Math.round(w * 0.055)));
     const fontTitle = Math.max(16, Math.round(w * 0.03));
@@ -227,7 +219,7 @@ Page({
 
   async saveOne(e) {
     const id = Number(e.currentTarget.dataset.id);
-    const okAuth = await ensureAlbumAuth();
+    const okAuth = await getApp().ensureAlbumAuth();
     if (!okAuth) return;
     wx.showLoading({ title: "生成水印中" });
     try {
@@ -262,7 +254,7 @@ Page({
       wx.showToast({ title: "没有可保存的照片", icon: "none" });
       return;
     }
-    const okAuth = await ensureAlbumAuth();
+    const okAuth = await getApp().ensureAlbumAuth();
     if (!okAuth) return;
 
     this.setData({ saving: true });

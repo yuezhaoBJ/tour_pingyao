@@ -9,7 +9,7 @@ root = Path("$ROOT/index.html").read_text(encoding="utf-8")
 m = re.search(r"const LOCATIONS = (\[[\s\S]*?\n    \]);\n\n    /\*\* @type", root)
 assert m, "LOCATIONS not found"
 js = "module.exports = " + m.group(1).replace('cover: "assets/', 'cover: "/assets/') + ";\n"
-out = Path("$ROOT/native/data/locations.js")
+out = Path("$ROOT/native/_src/data/locations.js")
 out.write_text(js, encoding="utf-8")
 print("✓", out)
 PY

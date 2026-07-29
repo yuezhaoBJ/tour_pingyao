@@ -1,10 +1,3 @@
-const {
-  shortTitle,
-  canComplete,
-  compressImageFile,
-  saveFilePersistent,
-} = require("../../utils/util");
-
 Page({
   data: {
     taskId: 0,
@@ -104,12 +97,12 @@ Page({
     const quizzes = task.quizzes || [];
     const quizIdx = Math.min(this._quizIdx || 0, Math.max(0, quizzes.length - 1));
 
-    const canFinish = canComplete(id, state) || done;
+    const canFinish = getApp().canComplete(id, state) || done;
     this.setData(
       Object.assign(
         {
           task: task,
-          shortTitle: shortTitle(task.title),
+          shortTitle: getApp().shortTitle(task.title),
           warmed: warmed,
           challenged: challenged,
           photo: photo,
@@ -130,7 +123,7 @@ Page({
       )
     );
 
-    wx.setNavigationBarTitle({ title: shortTitle(task.title) });
+    wx.setNavigationBarTitle({ title: getApp().shortTitle(task.title) });
   },
 
   onWarmChoice(e) {
@@ -224,7 +217,7 @@ Page({
             quizFbCls: "fb ok",
             challenged: true,
           },
-          this.syncCompleteBtn(canComplete(this.data.taskId, app.getState()), false)
+          this.syncCompleteBtn(getApp().canComplete(this.data.taskId, app.getState()), false)
         )
       );
       return;
@@ -251,9 +244,9 @@ Page({
         const file = res.tempFiles && res.tempFiles[0];
         if (!file) return;
         wx.showLoading({ title: "保存中" });
-        compressImageFile(file.tempFilePath)
+        getApp().compressImageFile(file.tempFilePath)
           .then(function (compressed) {
-            return saveFilePersistent(compressed);
+            return getApp().saveFilePersistent(compressed);
           })
           .then(function (saved) {
             const app = getApp();
@@ -270,7 +263,7 @@ Page({
                 {
                   photo: saved,
                 },
-                that.syncCompleteBtn(canComplete(that.data.taskId, app.getState()), false)
+                that.syncCompleteBtn(getApp().canComplete(that.data.taskId, app.getState()), false)
               )
             );
           })
@@ -306,7 +299,7 @@ Page({
       wx.navigateBack();
       return;
     }
-    if (!canComplete(id, state)) {
+    if (!getApp().canComplete(id, state)) {
       wx.showToast({ title: "请先完成作答", icon: "none" });
       return;
     }
